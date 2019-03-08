@@ -2,6 +2,7 @@ import yaml
 import os
 import re
 import sys
+import argparse
 
 def filestring(rel_path):
     return open(os.path.join(os.path.dirname(__file__),rel_path)).read()
@@ -17,6 +18,8 @@ def repl_match(name):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage:")
     target = sys.argv[1] + ".tex"
     template_type = sys.argv[2]
 
