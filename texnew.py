@@ -68,6 +68,7 @@ def run_output(target,template_type,data,user_info):
 
     with open(target,"a+") as output:
         # create doctype
+        output.write("% Template created by texnew (author: Alex Rutar); info can be found at 'https://github.com/alexrutar/texnew'.")
         write_div(output, "doctype")
         output.write(tex_doctype)
 
