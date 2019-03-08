@@ -1,0 +1,31 @@
+\usepackage[thref, thmmarks,amsmath]{ntheorem}
+
+% Numbered Statements
+\theoremindent{0.5cm}
+\theorembodyfont{\itshape}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+
+% Un-numbered Statements
+\theoremindent{0.0cm}
+\theorempreskip{0.1cm}
+\theorempostskip{0.1cm}
+\theorembodyfont{\upshape}
+\theoremheaderfont{\bfseries\itshape}
+\theoremstyle{nonumberplain}
+\newtheorem{definition}{Definition.}
+\theoremheaderfont{\itshape}
+\newtheorem{example}{Example.}
+\newtheorem{remark}{Remark.}
+
+% Proof / solution environments
+\theoremseparator{}
+\theoremheaderfont{\scshape}
+\theoremsymbol{$//$}
+\newtheorem{solution}{Sol'n}
+\theoremsymbol{$\blacksquare$}
+\theoremindent{0.5cm}
+\theorempostskip{0.5cm}
+\newtheorem{proof}{Proof}
