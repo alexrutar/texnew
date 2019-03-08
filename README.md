@@ -16,3 +16,6 @@ It's pretty easy to make your own templates. Here's the key information about th
 
 3. Formatting: src/formatting
     - Formatting files stored here are accessed by the 'formatting' option in the templates. I've generally used them to define formatting for the file appearance (fonts, titlepages, etc). They must include '\begin{document}' and '\end{document}'. Whever '<+key+>' appears in a formatting document, they are automatically replaced by the relevant info in the 'user.yaml' file. You can define new keys.
+
+4. Defaults: src/defaults
+    - Default files are loaded every time, regardless of the template used. Don't change the file names or weird things will happen, but feel free to change the defaults to whatever you want. 'doctype.tex' must have the document class, and the tag <+doctype+> is automatically substituted by the defined value in a template. 'macros.tex' is for default macros, and 'packages.tex' for default packages, as evidenced by the name.
