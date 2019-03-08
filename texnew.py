@@ -1,10 +1,7 @@
-# Hello
-
-# File Names: doctype, formatting, macros, packages
-# main source: main.tex
 import yaml
 import os
 import re
+import sys
 
 def filestring(rel_path):
     return open(os.path.join(os.path.dirname(__file__),rel_path)).read()
@@ -20,9 +17,12 @@ def repl_match(name):
 
 
 if __name__ == "__main__":
-    with open("test.yaml", 'r') as source:
-        data = yaml.load(source)
+    target = sys.argv[1] + ".tex"
+    template_type = sys.argv[2]
 
+    with open(os.path.join(os.path.dirname(__file__),"templates/" + template_type + ".yaml"), 'r') as source:
+        data = yaml.load(source)
+    
     tex_doctype = filestring("src/defaults/doctype.tex")
     tex_packages = filestring("src/defaults/packages.tex")
     tex_macros = filestring("src/defaults/macros.tex")
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     div = "% " + "-"*20
 
 
-    with open("out.tex","w+") as output:
+    with open(target,"a+") as output:
         # create doctype
         write_div(output, "doctype")
         output.write(re.sub(repl_match("doctype"), data['doctype'], tex_doctype))
