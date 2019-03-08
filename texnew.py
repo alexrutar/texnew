@@ -98,7 +98,7 @@ if __name__ == "__main__":
     else:
         target, template_type = parse()
         if os.path.exists(target):
-            print("The file \"{}\" already exists!".format(target))
+            print("Error: The file \"{}\" already exists. Please choose another filename.".format(target))
         else:
             try:
                 user_info = load_yaml("src/user_private.yaml")
@@ -107,7 +107,7 @@ if __name__ == "__main__":
                     user_info = load_yaml("src/user.yaml")
                 except FileNotFoundError:
                     user_info = {}
-                    print("User info file could not be found at src/user.yaml")
+                    print("Warning: user info file could not be found at 'src/user.yaml' or at 'src/user_private.yaml'. Run 'texnew -i' for more info.")
 
             try:
                 data = load_yaml("templates/" + template_type + ".yaml")
