@@ -6,7 +6,7 @@ In order to run this, you need some version of python (it definitely works in 3.
 ## Roll your own templates
 It's pretty easy to make your own templates. Here's the key information about the structure of this program:
 1. User Info: `src/user.yaml`, `src/user_private.yaml`
-    - Input custom user data here; see Formatting. If you want to pull updates from this repository without the default file overwriting your user file, you can also use `src/user\_private.yaml`. The program will default to using this file if possible.
+    - Input custom user data here; see Formatting. You can also use `src/user_private.yaml`. The program will default to using this file if possible. If the file does not exist, you will get a warning but the program will still generate a template (without substitutions).
 
 2. Templates: `templates`
     - Define new templates in the existing style. There are three (mandatory) options. `doctype` can be any valid LaTeX document type (e.g. article, book). `formatting` must be any filename (without extension) defined in Formatting. `macros` must be any filename (without extension) defined in Macros.
