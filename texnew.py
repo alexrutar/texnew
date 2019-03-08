@@ -16,7 +16,7 @@ def repl_match(name):
     if name == "any":
         return r"<\+.*\+>"
     else:
-        return r"<\+" + name + r"\+>"
+        return r"<\+" + str(name) + r"\+>"
 
 def truncated_files(rel_path):
     return ["".join(s.split(".")[:-1]) for s in os.listdir(os.path.join(os.path.dirname(__file__),rel_path))]
@@ -64,7 +64,7 @@ def run_output(target,template_type,data,user_info):
     tex_macros = filestring("src/defaults/macros.tex")
     tex_formatting = filestring("src/formatting/" + data['formatting'] + '.tex')
     for k in user_info.keys():
-        tex_formatting = re.sub(repl_match(k), user_info[k], tex_formatting)
+        tex_formatting = re.sub(repl_match(k), str(user_info[k]), tex_formatting)
 
     with open(target,"a+") as output:
         # create doctype
@@ -86,6 +86,10 @@ def run_output(target,template_type,data,user_info):
         write_div(output, "formatting")
         output.write(tex_formatting)
 
+def load_yaml(rel_path):
+    with open(os.path.join(os.path.dirname(__file__),rel_path),'r') as source:
+        return yaml.load(source)
+
 if __name__ == "__main__":
     if "-l" in sys.argv:
         print("Existing templates:\n"+ "\t".join(truncated_files("templates")))
@@ -97,9 +101,16 @@ if __name__ == "__main__":
             print("The file \"{}\" already exists!".format(target))
         else:
             try:
-                with open(os.path.join(os.path.dirname(__file__),"templates/" + template_type + ".yaml"), 'r') as source, open(os.path.join(os.path.dirname(__file__),"src/user.yaml"), 'r') as user_info:
-                    data = yaml.load(source)
-                    user_info = yaml.load(user_info)
+                user_info = load_yaml("src/user_private.yaml")
+            except FileNotFoundError:
+                try:
+                    user_info = load_yaml("src/user.yaml")
+                except FileNotFoundError:
+                    user_info = {}
+                    print("User info file could not be found at src/user.yaml")
+
+            try:
+                data = load_yaml("templates/" + template_type + ".yaml")
                 run_output(target,template_type,data,user_info)
             except FileNotFoundError:
                 print("The template \"{}\" does not exist! The possible template names are:\n".format(template_type)+ "\t".join(truncated_files("templates")))
