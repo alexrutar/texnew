@@ -47,7 +47,6 @@ def run_output(target,template_type,data):
     tex_packages = filestring("src/defaults/packages.tex")
     tex_macros = filestring("src/defaults/macros.tex")
     tex_formatting = filestring("src/formatting/" + data['formatting'] + '.tex')
-    tex_main = filestring("src/defaults/main.tex")
 
     with open(target,"a+") as output:
         # create doctype
@@ -68,10 +67,6 @@ def run_output(target,template_type,data):
         # add formatting file
         write_div(output, "formatting")
         output.write(tex_formatting)
-
-        # add main file
-        output.write(tex_main)
-
 
 if __name__ == "__main__":
     if "-l" in sys.argv or "--list" in sys.argv:
