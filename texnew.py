@@ -26,23 +26,20 @@ def print_detailed_info():
     print("   All other file paths are relative to this folder.")
 
     print("\nUser Info: src/user.yaml")
-    print("   Info: Input custom user data here; see Formatting")
+    print("   Input custom user data here; see Formatting")
 
-    print("\nTemplates")
-    print("   Info: Define new templates in the existing style. There are three (mandatory) options. 'doctype' can be any valid LaTeX document type (e.g. article, book). 'formatting' must be any filename (without extension) defined in Formatting. 'macros' must be any filename (without extension) defined in Macros.")
-    print("   Folder location: templates")
+    print("\nTemplates: templates")
+    print("   Define new templates in the existing style. There are three (mandatory) options. 'doctype' can be any valid LaTeX document type (e.g. article, book). 'formatting' must be any filename (without extension) defined in Formatting. 'macros' must be any filename (without extension) defined in Macros.")
 
-    print("\nMacros")
-    print("   Info: macro files stored here can be accessed by the 'macro' option in the templates")
-    print("   Folder location: src/macros")
+    print("\nMacros: src/macros")
+    print("  Macro files stored here are accessed by the 'macro' option in the templates")
 
-    print("\nFormatting")
-    print("   Info: formatting files stored here can be accessed by the 'formatting' option in the templates. They must include '\\begin{document}' and '\\end{document}'. Whever '<+key+>' appears in a formatting document, they are automatically replaced by the relevant info in the 'user.yaml' file. You can define new keys.")
-    print("   Folder location: src/formatting")
+    print("\nFormatting: src/formatting")
+    print("   Formatting files stored here are accessed by the 'formatting' option in the templates. They must include '\\begin{document}' and '\\end{document}'. Whever '<+key+>' appears in a formatting document, they are automatically replaced by the relevant info in the 'user.yaml' file. You can define new keys.")
 
 
 def parse():
-    parser = argparse.ArgumentParser(description='An automatic LaTeX template creator.')
+    parser = argparse.ArgumentParser(prog="texnew",description='An automatic LaTeX template creator.')
     parser.add_argument('target', metavar='output', type=str, nargs=1,
                                 help='the name of the file you want to create')
     parser.add_argument('template_type', metavar='template', type=str, nargs=1,
