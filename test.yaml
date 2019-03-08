@@ -1,0 +1,6 @@
+doctype: book # options: book, article
+formatting: titlepage # options: titlepage, header
+macros:
+    - theorem
+    - algebra
+    - analysis
