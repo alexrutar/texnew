@@ -13,19 +13,18 @@ def parse_errors(filename):
             if l.startswith("! "):
                 dct['fatal'] += [l]
             if l.startswith("./" + filename + ".tex:"):
-                temp = ""
+                temp = l
                 append = True
             if append:
                 temp += l
             if l.startswith("l."):
                 append = False
                 dct['errors'] += [temp]
-        dct['errors'] += [l.strip()]
     return dct
 
 def empty(dct):
     for key in dct.keys():
-        if dct[key] != []:
+        if len(dct[key]) != 0:
             return False
     return True
 
@@ -38,7 +37,7 @@ def run_autogen():
         p2 = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         p2.wait()
 
-        e = parse_errors("test/test.log")
+        e = parse_errors("test/test")
         if empty(e):
             print("No errors in template '{}'".format(tm))
         else:
@@ -49,10 +48,6 @@ def run_autogen():
         for fl in os.listdir("test"):
             fpath = os.path.join("test", fl)
             os.remove(fpath)
-    print(templates)
-    # get template list
-    # for each template:
-    #   compile it, check log for errors
-    #   if errors, print error messages along with line
+
 if __name__ == "__main__":
     run_autogen()
