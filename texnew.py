@@ -3,23 +3,16 @@ import os
 import re
 import sys
 import argparse
-
-def filestring(rel_path):
-    return open(os.path.join(os.path.dirname(__file__),rel_path)).read()
-
+from dir import filestring, truncated_files
 
 def write_div(out, name):
     out.write(("\n% " + name + " ").ljust(80, "-") + "\n")
-
 
 def repl_match(name):
     if name == "any":
         return r"<\+.*\+>"
     else:
         return r"<\+" + str(name) + r"\+>"
-
-def truncated_files(rel_path):
-    return ["".join(s.split(".")[:-1]) for s in os.listdir(os.path.join(os.path.dirname(__file__),rel_path))]
 
 def print_detailed_info():
     print("\nRoot Folder: {}/".format(os.path.dirname(__file__)))
@@ -112,6 +105,9 @@ if __name__ == "__main__":
 
             try:
                 data = load_yaml("templates/" + template_type + ".yaml")
-                run_output(target,template_type,data,user_info)
+                run = True
             except FileNotFoundError:
                 print("The template \"{}\" does not exist! The possible template names are:\n".format(template_type)+ "\t".join(truncated_files("templates")))
+                run = False
+            if run:
+                run_output(target,template_type,data,user_info)
