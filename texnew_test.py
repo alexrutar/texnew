@@ -24,7 +24,7 @@ def parse_errors(filename):
 
 def empty(dct):
     for key in dct.keys():
-        if len(dct[key]) != 0:
+        if dct[key]:
             return False
     return True
 
