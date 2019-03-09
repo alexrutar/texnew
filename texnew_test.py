@@ -9,6 +9,7 @@ def parse_errors(filename):
     # currently doesn't catch warnings
     with open(filename + ".log") as f:
         append = False
+        temp = ""
         for l in f:
             if l.startswith("! "):
                 dct['fatal'] += [l]
@@ -18,6 +19,7 @@ def parse_errors(filename):
             if append:
                 temp += l
             if l.startswith("l."):
+                temp += l
                 append = False
                 dct['errors'] += [temp]
     return dct
@@ -33,7 +35,7 @@ def run_autogen():
     for tm in templates:
         p1 = subprocess.Popen(["python3","texnew.py","test/test.tex",tm])
         p1.wait()
-        args = ['latexmk','-pdf', '-jobname=test/test',"test/test.tex"]
+        args = ['latexmk','-pdf', '-interaction=nonstopmode', '-jobname=test/test',"test/test.tex"]
         p2 = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         p2.wait()
 
@@ -41,10 +43,10 @@ def run_autogen():
         if empty(e):
             print("No errors in template '{}'".format(tm))
         else:
-            for key in e.keys():
-                print("{}:".format(key))
-                for error in e[key]:
-                    print(error)
+            print("Errors in template '{}'; .tex file can be found in the log folder.".format(tm))
+            with open("test/test.tex",'r') as f, open("log/{}.tex".format(tm),'a+') as output:
+                for l in f:
+                    output.write(l)
         for fl in os.listdir("test"):
             fpath = os.path.join("test", fl)
             os.remove(fpath)
