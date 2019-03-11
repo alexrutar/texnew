@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import argparse
+from texnew_test import run_test
 from dir import filestring, truncated_files
 
 def write_div(out, name):
@@ -40,6 +41,7 @@ def parse():
 
     parser.add_argument('-l', "--list", action="store_true", default=False, dest="lst",help="list existing templates")
     parser.add_argument('-i', "--info", action="store_true", default=False, dest="lst",help="display detailed info about template sources")
+    parser.add_argument('-c', "--check", action="store_true", default=False, dest="lst",help="check for errors in existing templates")
 
     args = parser.parse_args()
     target = args.target[0]
@@ -89,6 +91,8 @@ if __name__ == "__main__":
         print("Existing templates:\n"+ "\t".join(truncated_files("templates")))
     elif "-i" in sys.argv:
         print_detailed_info()
+    elif "-c" in sys.argv:
+        run_test()
     else:
         target, template_type = parse()
         if os.path.exists(target):

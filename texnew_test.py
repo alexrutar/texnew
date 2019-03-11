@@ -2,12 +2,11 @@ from dir import truncated_files
 import subprocess
 import os
 
-filename = "test"
-
+dirname = os.path.dirname(__file__)
 def parse_errors(filename):
     dct = {'errors':[],'warnings':[],'fatal':[]}
     # currently doesn't catch warnings
-    with open(filename + ".log") as f:
+    with open(os.path.join(dirname,filename + ".log")) as f:
         append = False
         temp = ""
         for l in f:
@@ -30,26 +29,28 @@ def empty(dct):
             return False
     return True
 
-def run_autogen():
+def run_test():
+    for fl in os.listdir(os.path.join(dirname,"log")):
+        fpath = os.path.join(dirname,os.path.join("log", fl))
+        os.remove(fpath)
+
     templates = truncated_files("templates")
     for tm in templates:
-        p1 = subprocess.Popen(["python3","texnew.py","test/test.tex",tm])
+        fl = os.path.join(dirname,"test")
+        fl_tex = fl + "/test.tex"
+        p1 = subprocess.Popen(["python3",os.path.join(dirname,"texnew.py"),fl_tex,tm])
         p1.wait()
-        args = ['latexmk','-pdf', '-interaction=nonstopmode', '-jobname=test/test',"test/test.tex"]
+        args = ['latexmk','-pdf', '-interaction=nonstopmode', '-outdir={}'.format(fl),fl_tex]
         p2 = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         p2.wait()
-
         e = parse_errors("test/test")
         if empty(e):
             print("No errors in template '{}'".format(tm))
         else:
             print("Errors in template '{}'; .tex file can be found in the log folder.".format(tm))
-            with open("test/test.tex",'r') as f, open("log/{}.tex".format(tm),'a+') as output:
+            with open(os.path.join(dirname,"test/test.tex"),'r') as f, open(os.path.join(dirname,"log/{}.tex".format(tm)),'w+') as output:
                 for l in f:
                     output.write(l)
-        for fl in os.listdir("test"):
-            fpath = os.path.join("test", fl)
+        for fl in os.listdir(os.path.join(dirname,"test")):
+            fpath = os.path.join(dirname,os.path.join("test", fl))
             os.remove(fpath)
-
-if __name__ == "__main__":
-    run_autogen()
