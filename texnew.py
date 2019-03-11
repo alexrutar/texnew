@@ -4,7 +4,7 @@ import re
 import sys
 import argparse
 from texnew_test import run_test
-from dir import filestring, truncated_files
+from dir import filestring, truncated_files, rpath
 
 def write_div(out, name):
     out.write(("\n% " + name + " ").ljust(80, "-") + "\n")
@@ -54,10 +54,10 @@ def parse():
 
 
 def run_output(target,template_type,data,user_info):
-    tex_doctype = re.sub(repl_match("doctype"), data['doctype'], filestring("src/defaults/doctype.tex"))
-    tex_packages = filestring("src/defaults/packages.tex")
-    tex_macros = filestring("src/defaults/macros.tex")
-    tex_formatting = filestring("src/formatting/" + data['formatting'] + '.tex')
+    tex_doctype = re.sub(repl_match("doctype"), data['doctype'], filestring("src","defaults","doctype.tex"))
+    tex_packages = filestring("src","defaults","packages.tex")
+    tex_macros = filestring("src","defaults","macros.tex")
+    tex_formatting = filestring("src","formatting",data['formatting'] + '.tex')
     for k in user_info.keys():
         tex_formatting = re.sub(repl_match(k), str(user_info[k]), tex_formatting)
 
@@ -76,14 +76,14 @@ def run_output(target,template_type,data,user_info):
         output.write(tex_macros)
         for name in data['macros']:
             write_div(output, name+" macros")
-            output.write(filestring("src/macros/" + name + ".tex"))
+            output.write(filestring("src","macros",name + ".tex"))
 
         # add formatting file
         write_div(output, "formatting")
         output.write(tex_formatting)
 
-def load_yaml(rel_path):
-    with open(os.path.join(os.path.dirname(__file__),rel_path),'r') as source:
+def load_yaml(*rel_path):
+    with open(rpath(*rel_path),'r') as source:
         return yaml.load(source)
 
 if __name__ == "__main__":
@@ -99,16 +99,16 @@ if __name__ == "__main__":
             print("Error: The file \"{}\" already exists. Please choose another filename.".format(target))
         else:
             try:
-                user_info = load_yaml("src/user_private.yaml")
+                user_info = load_yaml("src","user_private.yaml")
             except FileNotFoundError:
                 try:
-                    user_info = load_yaml("src/user.yaml")
+                    user_info = load_yaml("src","user.yaml")
                 except FileNotFoundError:
                     user_info = {}
                     print("Warning: user info file could not be found at 'src/user.yaml' or at 'src/user_private.yaml'. Run 'texnew -i' for more info.")
 
             try:
-                data = load_yaml("templates/" + template_type + ".yaml")
+                data = load_yaml("templates",template_type + ".yaml")
                 run = True
             except FileNotFoundError:
                 print("The template \"{}\" does not exist! The possible template names are:\n".format(template_type)+ "\t".join(truncated_files("templates")))
