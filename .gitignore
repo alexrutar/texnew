@@ -2,3 +2,4 @@
 src/user_private.yaml
 **/*.swp
 test/*
+__pycache__
