@@ -1,4 +1,4 @@
-from dir import truncated_files, rpath, clean_dir
+from dir import truncated_files, rpath, clean_dir, copy_file
 import subprocess
 import os
 
@@ -53,6 +53,7 @@ def run_test():
         else:
             print("Errors in template '{}'; .tex file can be found in the log folder.".format(tm))
             copy_file(rpath("test","test.tex"),rpath("log","{}.tex".format(tm)))
+            copy_file(rpath("test","test.log"),rpath("log","{}.log".format(tm)))
 
         # clean up
         clean_dir("test")
