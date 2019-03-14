@@ -1,37 +1,10 @@
-import yaml
-import os
-import re
 import sys
 import argparse
-from texnew_test import run_test
-from dir import filestring, truncated_files, rpath
+from test import run_test
+from core import texnew_run
+from file_mgr import truncated_files
 
-def write_div(out, name):
-    out.write(("\n% " + name + " ").ljust(80, "-") + "\n")
-
-def repl_match(name):
-    if name == "any":
-        return r"<\+.*\+>"
-    else:
-        return r"<\+" + str(name) + r"\+>"
-
-def print_detailed_info():
-    print("\nRoot Folder: {}/".format(os.path.dirname(__file__)))
-    print("   All other file paths are relative to this folder.")
-
-    print("\nUser Info: src/user.yaml")
-    print("   Input custom user data here; see Formatting")
-
-    print("\nTemplates: templates")
-    print("   Define new templates in the existing style. There are three (mandatory) options. 'doctype' can be any valid LaTeX document type (e.g. article, book). 'formatting' must be any filename (without extension) defined in Formatting. 'macros' must be any filename (without extension) defined in Macros.")
-
-    print("\nMacros: src/macros")
-    print("  Macro files stored here are accessed by the 'macro' option in the templates")
-
-    print("\nFormatting: src/formatting")
-    print("   Formatting files stored here are accessed by the 'formatting' option in the templates. They must include '\\begin{document}' and '\\end{document}'. Whever '<+key+>' appears in a formatting document, they are automatically replaced by the relevant info in the 'user.yaml' file. You can define new keys.")
-
-
+# main argument parser, after pre-checking info
 def parse():
     parser = argparse.ArgumentParser(prog="texnew",description='An automatic LaTeX template creator.')
     parser.add_argument('target', metavar='output', type=str, nargs=1,
@@ -39,79 +12,25 @@ def parse():
     parser.add_argument('template_type', metavar='template', type=str, nargs=1,
                                 help='the name of the template to use')
 
-    parser.add_argument('-l', "--list", action="store_true", default=False, dest="lst",help="list existing templates")
-    parser.add_argument('-i', "--info", action="store_true", default=False, dest="lst",help="display detailed info about template sources")
+    parser.add_argument('-l', "--list", action="store_true", default=False, dest="lst",help="list existing templates and root folder")
     parser.add_argument('-c', "--check", action="store_true", default=False, dest="lst",help="check for errors in existing templates")
+    parser.add_argument('-u', "--update", action="store_true", default=False, dest="update",help="update the specified file with the desired template")
 
     args = parser.parse_args()
-    target = args.target[0]
-    if not target.endswith(".tex"):
-        target = target + ".tex"
-    template_type = args.template_type[0]
-    truncated_files("templates")
+    return (args.target[0], args.template_type[0], args.update)
 
-    return (target, template_type)
-
-
-def run_output(target,template_type,data,user_info):
-    tex_doctype = re.sub(repl_match("doctype"), data['doctype'], filestring("src","defaults","doctype.tex"))
-    tex_packages = filestring("src","defaults","packages.tex")
-    tex_macros = filestring("src","defaults","macros.tex")
-    tex_formatting = filestring("src","formatting",data['formatting'] + '.tex')
-    for k in user_info.keys():
-        tex_formatting = re.sub(repl_match(k), str(user_info[k]), tex_formatting)
-
-    with open(target,"a+") as output:
-        # create doctype
-        output.write("% Template created by texnew (author: Alex Rutar); info can be found at 'https://github.com/alexrutar/texnew'.")
-        write_div(output, "doctype")
-        output.write(tex_doctype)
-
-        # add default packates
-        write_div(output, "packages")
-        output.write(tex_packages)
-
-        # add included macros
-        write_div(output, "default macros")
-        output.write(tex_macros)
-        for name in data['macros']:
-            write_div(output, name+" macros")
-            output.write(filestring("src","macros",name + ".tex"))
-
-        # add formatting file
-        write_div(output, "formatting")
-        output.write(tex_formatting)
-
-def load_yaml(*rel_path):
-    with open(rpath(*rel_path),'r') as source:
-        return yaml.load(source)
-
+# entry point for script
 if __name__ == "__main__":
     if "-l" in sys.argv:
+        print("\nRoot Folder: {}/".format(os.path.dirname(__file__)))
         print("Existing templates:\n"+ "\t".join(truncated_files("templates")))
-    elif "-i" in sys.argv:
-        print_detailed_info()
     elif "-c" in sys.argv:
         run_test()
     else:
-        target, template_type = parse()
-        if os.path.exists(target):
-            print("Error: The file \"{}\" already exists. Please choose another filename.".format(target))
+        target, template_type, update = parse()
+        if update:
+            texnew_update(target, template_type)
         else:
-            try:
-                user_info = load_yaml("src","user_private.yaml")
-            except FileNotFoundError:
-                try:
-                    user_info = load_yaml("src","user.yaml")
-                except FileNotFoundError:
-                    user_info = {}
-                    print("Warning: user info file could not be found at 'src/user.yaml' or at 'src/user_private.yaml'. Run 'texnew -i' for more info.")
-
-            try:
-                data = load_yaml("templates",template_type + ".yaml")
-                run = True
-            except FileNotFoundError:
-                print("The template \"{}\" does not exist! The possible template names are:\n".format(template_type)+ "\t".join(truncated_files("templates")))
-                run = False
-            if run:
-                run_output(target,template_type,data,user_info)
+            if not target.endswith(".tex"):
+                target = target + ".tex"
+            texnew_run(target, template_type, [])

@@ -16,3 +16,20 @@ def copy_file(src,trg):
     with open(src,'r') as f, open(trg,'a+') as output:
         for l in f:
             output.write(l)
+
+def lsplit(lst, start_cond, end_cond):
+    out = []
+    read = False
+    temp = []
+    for l in lst:
+        if read and end_cond(l):
+            read = False
+            out += [temp]
+        if start_cond(l):
+            read = True
+            temp = []
+        if read:
+            temp += [l]
+    if read:
+        out += [temp]
+    return out

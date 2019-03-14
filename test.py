@@ -1,6 +1,7 @@
-from dir import truncated_files, rpath, clean_dir, copy_file
+from file_mgr import truncated_files, rpath, clean_dir, copy_file
 import subprocess
 import os
+from core import texnew_run
 
 dirname = os.path.dirname(__file__)
 def parse_errors(filename):
@@ -23,7 +24,7 @@ def parse_errors(filename):
                 dct['errors'] += [temp]
     return dct
 
-def empty(dct):
+def is_empty(dct):
     for key in dct.keys():
         if dct[key]:
             return False
@@ -33,8 +34,7 @@ def run_test():
     clean_dir("log")
     for tm in truncated_files("templates"):
         # build the template in "test"
-        p1 = subprocess.Popen(["python3",rpath("texnew.py"),rpath("test","test"),tm])
-        p1.wait()
+        texnew_run(rpath("test","test.tex"), tm, [])
 
         # compile the template
         lmk_args = [
@@ -48,7 +48,7 @@ def run_test():
 
         # parse for errors, print errors if they exist
         e = parse_errors("test/test")
-        if empty(e):
+        if is_empty(e):
             print("No errors in template '{}'".format(tm))
         else:
             print("Errors in template '{}'; .tex file can be found in the log folder.".format(tm))
