@@ -34,7 +34,7 @@ def run_test():
     clean_dir("log")
     for tm in truncated_files("templates"):
         # build the template in "test"
-        texnew_run(rpath("test","test.tex"), tm, [])
+        texnew_run(rpath("test","test.tex"), tm)
 
         # compile the template
         lmk_args = [
@@ -51,7 +51,7 @@ def run_test():
         if is_empty(e):
             print("No errors in template '{}'".format(tm))
         else:
-            print("Errors in template '{}'; .tex file can be found in the log folder.".format(tm))
+            print("Errors in template '{}'; .tex file can be found in the log folder at '{}'.".format(tm,rpath("log")))
             copy_file(rpath("test","test.tex"),rpath("log","{}.tex".format(tm)))
             copy_file(rpath("test","test.log"),rpath("log","{}.log".format(tm)))
 

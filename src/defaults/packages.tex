@@ -1,10 +1,14 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-\usepackage{emptypage}
 \usepackage{graphicx}
-\usepackage{enumitem}
 
+% Set enimitem
+\usepackage{enumitem}
+\SetEnumitemKey{nl}{nolistsep}
+\SetEnumitemKey{nlr}{nolistsep,label=(\roman*)}
+
+% Set tikz
 \usepackage{tikz, pgfplots}
 \pgfplotsset{compat=1.15}
 \usetikzlibrary{intersections}

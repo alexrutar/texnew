@@ -1,6 +1,5 @@
 \usepackage{kpfonts}
 \usepackage{dsfont}
-\usepackage[hidelinks]{hyperref}
 
 % Define Document Variables
 \newcommand{\subject}{REPLACE}
@@ -45,11 +44,8 @@
 \hypersetup{pageanchor=false}
 \maketitle
 \newpage
-\pagenumbering{roman}
+\frontmatter
 \hypersetup{pageanchor=true}
 \tableofcontents*
-\pagenumbering{arabic}
-
-\chapter{REPLACE}
-REPLACE
-\end{document}
+\newpage
+\mainmatter

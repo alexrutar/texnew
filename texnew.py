@@ -3,6 +3,7 @@ import argparse
 from test import run_test
 from core import texnew_run
 from file_mgr import truncated_files
+from update import texnew_update
 
 # main argument parser, after pre-checking info
 def parse():
@@ -33,4 +34,4 @@ if __name__ == "__main__":
         else:
             if not target.endswith(".tex"):
                 target = target + ".tex"
-            texnew_run(target, template_type, [])
+            texnew_run(target, template_type)

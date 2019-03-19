@@ -1,9 +1,12 @@
-\usepackage[thref, thmmarks,amsmath]{ntheorem}
+\usepackage[hidelinks]{hyperref}
+\usepackage[thmmarks,amsmath,hyperref]{ntheorem}
+\usepackage[capitalise,nameinlink]{cleveref}
 
 % Numbered Statements
-\theoremindent0.5cm
+\theoremindent\parindent
 \theorembodyfont{\itshape}
-\newtheorem{theorem}{Theorem}[chapter]
+\theoremheaderfont{\bfseries\boldmath}
+\newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{proposition}[theorem]{Proposition}
@@ -22,10 +25,9 @@
 
 % Proof / solution environments
 \theoremseparator{}
-\theoremheaderfont{\scshape}
+\theoremheaderfont{\hspace*{\parindent}\scshape}
 \theoremsymbol{$//$}
 \newtheorem{solution}{Sol'n}
 \theoremsymbol{$\blacksquare$}
-\theoremindent0.5cm
-\theorempostskip{0.5cm}
+\theorempostskip{0.4cm}
 \newtheorem{proof}{Proof}

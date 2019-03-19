@@ -1,10 +1,10 @@
 import yaml
 import os
 import re
-from file_mgr import filestring, truncated_files, rpath
+from file_mgr import filestring, truncated_files, rpath, get_div
 
 def write_div(out, name):
-    out.write(("\n% " + name + " ").ljust(80, "-") + "\n")
+    out.write("\n" + get_div(name))
 
 def repl_match(name):
     if name == "any":
@@ -22,8 +22,9 @@ def run_output(target,template_type,data,user_info,user_macros):
         tex_formatting = re.sub(repl_match(k), str(user_info[k]), tex_formatting)
 
     with open(target,"a+") as output:
-        # create doctype
         output.write("% Template created by texnew (author: Alex Rutar); info can be found at 'https://github.com/alexrutar/texnew'.")
+
+        # create doctype
         write_div(output, "doctype")
         output.write(tex_doctype)
 
@@ -41,8 +42,8 @@ def run_output(target,template_type,data,user_info,user_macros):
 
         # add space for user macros
         write_div(output, "file-specific macros")
-        if user_macros:
-            for l in user_macros:
+        if 'macros' in user_macros.keys():
+            for l in user_macros['macros']:
                 output.write(l)
         else:
             output.write("% REPLACE\n")
@@ -50,6 +51,16 @@ def run_output(target,template_type,data,user_info,user_macros):
         # add formatting file
         write_div(output, "formatting")
         output.write(tex_formatting)
+
+        write_div(output, "document start")
+
+        # check for contents in user_macros
+        if 'contents' in user_macros.keys():
+            for l in user_macros['contents']:
+                output.write(l)
+        else:
+            output.write("\nREPLACE\n")
+            output.write("\\end{document}"+"\n")
 
 def load_yaml(*rel_path):
     with open(rpath(*rel_path),'r') as source:
@@ -64,8 +75,8 @@ def get_data(template_type):
     return data
 
 # essentially a wrapper for run_output
-def texnew_run(target, template_type, user_macros):
-    if os.path.exists(target) and not update:
+def texnew_run(target, template_type, user_macros={}):
+    if os.path.exists(target):
         print("Error: The file \"{}\" already exists. Please choose another filename.".format(target))
     else:
         try:
