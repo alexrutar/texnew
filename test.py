@@ -1,9 +1,11 @@
-from file_mgr import truncated_files, rpath, clean_dir, copy_file
 import subprocess
 import os
-from core import texnew_run
 
-dirname = os.path.dirname(__file__)
+from core import texnew_run
+from file_mgr import truncated_files, rpath, clean_dir, copy_file
+
+# parse the file for errors
+# TODO: this is garbage, fix it
 def parse_errors(filename):
     dct = {'errors':[],'warnings':[],'fatal':[]}
     # currently doesn't catch warnings
@@ -24,14 +26,19 @@ def parse_errors(filename):
                 dct['errors'] += [temp]
     return dct
 
+# check if a dct has any non-empty lists
 def is_empty(dct):
     for key in dct.keys():
         if dct[key]:
             return False
     return True
 
+# run the test
 def run_test():
+    # clean log directory
     clean_dir("log")
+
+    # iterate over possible template names
     for tm in truncated_files("templates"):
         # build the template in "test"
         texnew_run(rpath("test","test.tex"), tm)
@@ -43,7 +50,7 @@ def run_test():
                 '-interaction=nonstopmode',
                 '-outdir={}'.format(rpath("test")),
                 rpath("test","test.tex")]
-        p2 = subprocess.Popen(lmk_args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        p2 = subprocess.Popen(lmk_args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) # TODO: not good to suppress errors
         p2.wait()
 
         # parse for errors, print errors if they exist
@@ -51,9 +58,10 @@ def run_test():
         if is_empty(e):
             print("No errors in template '{}'".format(tm))
         else:
+            # if there are errors, we copy the relevant files to the log folder
             print("Errors in template '{}'; .tex file can be found in the log folder at '{}'.".format(tm,rpath("log")))
-            copy_file(rpath("test","test.tex"),rpath("log","{}.tex".format(tm)))
-            copy_file(rpath("test","test.log"),rpath("log","{}.log".format(tm)))
+            copy_file(rpath("test","test.tex"),rpath("log",tm + ".tex"))
+            copy_file(rpath("test","test.log"),rpath("log",tm + ".log"))
 
         # clean up
         clean_dir("test")

@@ -1,24 +1,35 @@
 import os
 
+# create a new block divider
 def get_div(name):
     return ("% " + name + " ").ljust(80, "-") + "\n"
-def truncated_files(rel_path):
-    return ["".join(s.split(".")[:-1]) for s in os.listdir(os.path.join(os.path.dirname(__file__),rel_path))]
+
+# get the relative path, from this script
 def rpath(*rel_path):
     return os.path.join(os.path.dirname(__file__),*rel_path)
+
+# remove the file endings
+def truncated_files(*rel_path):
+    return ["".join(s.split(".")[:-1]) for s in os.listdir(rpath(*rel_path))]
+
+# clean the directory at a relative path
 def clean_dir(*rel_path):
     for fl in os.listdir(rpath(*rel_path)):
         os.remove(rpath(*rel_path,fl))
+
+# read file at a relative path
 def filestring(*rel_path):
     with open(rpath(*rel_path)) as f:
         out = f.read()
     return out
 
+# copy a file to the target; only appends, does not overwrite
 def copy_file(src,trg):
     with open(src,'r') as f, open(trg,'a+') as output:
         for l in f:
             output.write(l)
 
+# get an available name, inserting 'ad' if necessary
 def get_name(name,ad):
     if "." in name:
         base = "".join(name.split(".")[:-1])
@@ -31,19 +42,26 @@ def get_name(name,ad):
         if not os.path.exists(attempt):
             return attempt
 
-def lsplit(lst, start_cond, end_cond):
-    out = []
+# check if a string is a divider (with any name)
+def is_div(st):
+    dv = get_div("")
+    return len(st) == len(dv) and st.startswith(dv[:2]) and st.endswith(dv[-3:])
+
+# separate a block named div_name
+def sep_block(lst, div_name):
+    start = get_div(div_name)
     read = False
-    temp = []
-    for l in lst:
-        if read and end_cond(l):
-            read = False
-            out += [temp]
-        if read:
-            temp += [l]
-        if start_cond(l):
+    id1 = None
+    id2 = None
+    for e,l in enumerate(lst):
+        if read and is_div(l):
+            id2 = e
+            break
+        if l == start:
+            id1 = e+1
             read = True
-            temp = []
-    if read:
-        out += [temp]
-    return out
+    if id1 is None:
+        return []
+    if id2 is None:
+        return lst[id1:]
+    return lst[id1:id2]

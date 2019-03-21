@@ -1,18 +1,21 @@
 import yaml
 import os
 import re
+
 from file_mgr import filestring, truncated_files, rpath, get_div
 
+# print a divider to the specified output
 def write_div(out, name):
     out.write("\n" + get_div(name))
 
+# creates a matching regex for file substitution
 def repl_match(name):
     if name == "any":
         return r"<\+.*\+>"
     else:
         return r"<\+" + str(name) + r"\+>"
 
-
+# the main file-building function
 def run_output(target,template_type,data,user_info,user_macros):
     tex_doctype = re.sub(repl_match("doctype"), data['doctype'], filestring("src","defaults","doctype.tex"))
     tex_packages = filestring("src","defaults","packages.tex")
@@ -52,9 +55,8 @@ def run_output(target,template_type,data,user_info,user_macros):
         write_div(output, "formatting")
         output.write(tex_formatting)
 
+        # check for contents in user_macros to fill document
         write_div(output, "document start")
-
-        # check for contents in user_macros
         if 'contents' in user_macros.keys():
             for l in user_macros['contents']:
                 output.write(l)
@@ -62,10 +64,12 @@ def run_output(target,template_type,data,user_info,user_macros):
             output.write("\nREPLACE\n")
             output.write("\\end{document}"+"\n")
 
+# return yaml information from a relative path
 def load_yaml(*rel_path):
     with open(rpath(*rel_path),'r') as source:
         return yaml.load(source)
 
+# load template information
 def get_data(template_type):
     data = []
     try:

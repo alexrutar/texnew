@@ -1,22 +1,9 @@
-# take input file
-# separate input file into:
-# - file macros
-# - main files
-# merge macros + main file with new template
-# copy file to new location
-# write new version of file
-from file_mgr import copy_file, lsplit, get_name, get_div
-from core import texnew_run
 import os
 
-def match_div(name=""):
-    st = get_div(name)
-    if name:
-        return lambda x:x == get_div(name)
-    else:
-        st = get_div("")
-        return lambda x:len(x) == len(st) and x.startswith(st[:2]) and x.endswith(st[-3:])
+from file_mgr import copy_file, get_name, get_div, sep_block
+from core import texnew_run
 
+# main update function
 def texnew_update(filename, template_type):
     if not os.path.exists(filename):
         print("Error: The file \"{}\" does not exist. Please choose another filename.".format(filename))
@@ -25,12 +12,16 @@ def texnew_update(filename, template_type):
         name = get_name(filename,"_old")
         os.rename(filename,name)
 
-        # read contents of file to user dict
+        # read contents of file to user dict by separating relevant blocks
         with open(name,'r') as f:
             fl = list(f)
-        macros = lsplit(fl,match_div("file-specific macros"),match_div())[0]
-        body = lsplit(fl,match_div("document start"),lambda x:False)[0]
-        macros[-1] = macros[-1].rstrip()
-        user = {'macros':macros,'contents':body}
+        macros = sep_block(fl,"file-specific macros")
+        body = sep_block(fl,"document start")
 
+        # strip last item of macros to avoid increasing whitespace in file
+        if len(macros) >= 1:
+            macros[-1] = macros[-1].rstrip()
+
+        # rebuild file
+        user = {'macros':macros,'contents':body}
         texnew_run(filename, template_type, user_macros=user)
