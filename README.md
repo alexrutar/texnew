@@ -7,7 +7,7 @@ In order to run this, you need some version of python (it definitely works in 3.
 If you've created a template using this program (after March 20, 2019), you can automatically update the template using `texnew -u <file.tex> <template>`. This saves file macros you've defined (under `file-specific macros`), as well as the main contents of your document (after `document start`), and places them in a newly generated template, generated from the updated macro files. Your old file is saved in the same directory.
 
 ### Checking your templates
-If you made changes to macro files, you can run `texnew -c` to automatically compile your templates and check for LaTeX errors (any error that shows up in your log file). Note that the checker works by making a system call to `latexmk`, so it may not work on your system. It also might not work on windows no matter what. I'm not sure.
+If you made changes to macro files, you can run `texnew -c` to automatically compile your templates and check for LaTeX errors (any error that shows up in your log file). Note that the checker works by making a system call to `latexmk`, so it may not work on your system. It also might not work on Windows no matter what. I'm not sure.
 
 ## Roll your own templates
 It's pretty easy to make your own templates. Here's the key information about the structure of this program:
@@ -29,13 +29,13 @@ It's pretty easy to make your own templates. Here's the key information about th
     - Default files are loaded every time, regardless of the template used. Don't change the file names or weird things will happen, but feel free to change the defaults to whatever you want. `doctype.tex` must have the document class, and the tag `<+doctype+>` is automatically substituted by the defined value in a template. `macros.tex` is for default macros, and `packages.tex` for default packages, as evidenced by the name.
 
 ### Import Order
-To avoid errors when designing templates, it is useful to know the order in whcih the template files are placed.
+To avoid errors when designing templates, it is useful to know the order in which the template files are placed.
 This is given as follows:
 1. `src/defaults/doctype.tex`
 2. `src/defaults/packages.tex`
 3. `src/defaults/macros.tex`
 4. Any macro files included in the template, imported in the same order specified.
-5. A space for user macros (user macros are placed here when updating).
+5. A space for file-specific macros (user macros are placed here when updating a file).
 6. `src/formatting/*.tex`, whatever formatting file you specified
 7. A space for the main document (document is placed here when updating).
 As a general rule, I try to avoid importing anything in the formatting file (notable exception: font packages).
