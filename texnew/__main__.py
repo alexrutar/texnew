@@ -35,7 +35,7 @@ def get_usage():
     return '\n\n\n'.join(__doc__.split('\n\n\n')[1:])
 # main argument parser, after pre-checking info
 def parse():
-    parser = argparse.ArgumentParser(prog="texnew",description='An automatic LaTeX template creator.',usage=get_usage())
+    parser = argparse.ArgumentParser(prog="texnew",description='An automatic LaTeX template creator and manager.',usage=get_usage())
     parser.add_argument('target', metavar='output', type=str, nargs=1,
                                 help='the name of the file you want to create')
     parser.add_argument('template_type', metavar='template', type=str, nargs=1,

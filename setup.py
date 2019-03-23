@@ -7,13 +7,13 @@ def readme():
 setup(
     name='texnew',
     version=__version__,
-    description='Automatic LaTeX template mangement.',
+    description='An automatic LaTeX template creator and manager.',
     long_description=readme(),
     url='https://github.com/alexrutar/texnew',
     author='Alex Rutar',
     author_email='arutar@uwaterloo.ca',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Programming Language :: Python :: 3.7',
         'License :: OSI Approved :: MIT License'
         ],
