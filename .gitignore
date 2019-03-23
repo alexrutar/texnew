@@ -1,8 +1,11 @@
-*
+# Ignore everything
+/*
+
 # Main files
-!/texnew/**
+!/texnew/
 !Makefile
 !.gitignore
+texnew/__pycache__
 
 # Info
 !LICENSE
