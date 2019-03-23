@@ -1,6 +1,0 @@
-doctype: article # options: book, article
-formatting: header # options: titlepage, header
-macros:
-    - theorem_short
-    - algebra
-    - analysis

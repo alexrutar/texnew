@@ -39,7 +39,7 @@ def test():
     clean_dir("log")
 
     # iterate over possible template names
-    for tm in truncated_files("share","templates"):
+    for tm in truncated_files("templates"):
         # build the template in "test"
         run(rpath("test","test.tex"), tm)
 

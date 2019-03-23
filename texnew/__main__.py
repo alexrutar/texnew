@@ -24,7 +24,7 @@ def parse():
 def main():
     if "-l" in sys.argv:
         print("\nRoot Folder: {}/".format(rpath()))
-        print("Existing templates:\n"+ "\t".join(truncated_files("share","templates")))
+        print("Existing templates:\n"+ "\t".join(truncated_files("templates")))
     elif "-c" in sys.argv:
         test()
     else:

@@ -1,4 +1,5 @@
 import os
+from os.path import expanduser
 
 from . import __path__
 
@@ -8,7 +9,7 @@ def get_div(name):
 
 # get the relative path, from this script
 def rpath(*rel_path):
-    return os.path.join(os.path.dirname(__path__[0]),*rel_path)
+    return os.path.join(expanduser("~"),".texnew",*rel_path)
 
 # remove the file endings
 def truncated_files(*rel_path):

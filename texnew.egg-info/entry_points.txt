@@ -1,0 +1,3 @@
+[console_scripts]
+texnew = texnew.__main__:main
+
