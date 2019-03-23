@@ -1,8 +1,8 @@
 import subprocess
 import os
 
-from core import texnew_run
-from file_mgr import truncated_files, rpath, clean_dir, copy_file
+from .core import run
+from .file_mgr import truncated_files, rpath, clean_dir, copy_file
 
 # parse the file for errors
 # TODO: this is garbage, fix it
@@ -34,14 +34,14 @@ def is_empty(dct):
     return True
 
 # run the test
-def run_test():
+def test():
     # clean log directory
     clean_dir("log")
 
     # iterate over possible template names
-    for tm in truncated_files("templates"):
+    for tm in truncated_files("share","templates"):
         # build the template in "test"
-        texnew_run(rpath("test","test.tex"), tm)
+        run(rpath("test","test.tex"), tm)
 
         # compile the template
         lmk_args = [

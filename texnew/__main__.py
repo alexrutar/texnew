@@ -1,10 +1,10 @@
 import sys
 import argparse
 
-from test import run_test
-from core import texnew_run
-from file_mgr import truncated_files
-from update import texnew_update
+from .test import test
+from .core import run
+from .file_mgr import truncated_files
+from .update import update
 
 # main argument parser, after pre-checking info
 def parse():
@@ -21,18 +21,21 @@ def parse():
     args = parser.parse_args()
     return (args.target[0], args.template_type[0], args.update)
 
-# entry point for script
-if __name__ == "__main__":
+def main():
     if "-l" in sys.argv:
-        print("\nRoot Folder: {}/".format(os.path.dirname(__file__)))
-        print("Existing templates:\n"+ "\t".join(truncated_files("templates")))
+        print("\nRoot Folder: {}/".format(rpath()))
+        print("Existing templates:\n"+ "\t".join(truncated_files("share","templates")))
     elif "-c" in sys.argv:
-        run_test()
+        test()
     else:
         target, template_type, update = parse()
         if update:
-            texnew_update(target, template_type)
+            update(target, template_type)
         else:
             if not target.endswith(".tex"):
                 target = target + ".tex"
-            texnew_run(target, template_type)
+            run(target, template_type)
+
+# entry point for script
+if __name__ == "__main__":
+    main()

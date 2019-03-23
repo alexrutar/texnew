@@ -1,10 +1,10 @@
 import os
 
-from file_mgr import copy_file, get_name, get_div, sep_block
-from core import texnew_run
+from .file_mgr import copy_file, get_name, get_div, sep_block
+from .core import run
 
 # main update function
-def texnew_update(filename, template_type):
+def update(filename, template_type):
     if not os.path.exists(filename):
         print("Error: The file \"{}\" does not exist. Please choose another filename.".format(filename))
     else:
@@ -24,4 +24,4 @@ def texnew_update(filename, template_type):
 
         # rebuild file
         user = {'macros':macros,'contents':body}
-        texnew_run(filename, template_type, user_macros=user)
+        run(filename, template_type, user_macros=user)

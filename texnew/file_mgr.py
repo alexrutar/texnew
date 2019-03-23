@@ -1,12 +1,14 @@
 import os
 
+from . import __path__
+
 # create a new block divider
 def get_div(name):
     return ("% " + name + " ").ljust(80, "-") + "\n"
 
 # get the relative path, from this script
 def rpath(*rel_path):
-    return os.path.join(os.path.dirname(__file__),*rel_path)
+    return os.path.join(os.path.dirname(__path__[0]),*rel_path)
 
 # remove the file endings
 def truncated_files(*rel_path):

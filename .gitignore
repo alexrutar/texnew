@@ -2,5 +2,5 @@
 src/user_private.yaml
 **/*.swp
 test/*
-__pycache__
+texnew/__pycache__
 log/*
