@@ -22,6 +22,8 @@ def run_output(target,template_type,data,user_info,user_macros):
     tex_packages = filestring("share","defaults","packages.tex")
     tex_macros = filestring("share","defaults","macros.tex")
     tex_formatting = filestring("share","formatting",data['formatting'] + '.tex')
+    
+    # substitute user_info
     for k in user_info.keys():
         tex_formatting = re.sub(repl_match(k), str(user_info[k]), tex_formatting)
 
@@ -44,7 +46,6 @@ def run_output(target,template_type,data,user_info,user_macros):
             write_div(output, name+" macros")
             output.write(filestring("share","macros",name + ".tex"))
 
-
         # add space for user macros
         write_div(output, "file-specific macros")
         if 'macros' in user_macros.keys():
@@ -64,7 +65,7 @@ def run_output(target,template_type,data,user_info,user_macros):
                 output.write(l)
         else:
             output.write("\nREPLACE\n")
-            output.write("\\end{document}"+"\n")
+            output.write("\\end{document}\n")
 
 # return yaml information from a relative path
 def load_yaml(*rel_path):
@@ -92,7 +93,7 @@ def run(target, template_type, user_macros={}):
                 user_info = load_yaml("user.yaml")
             except FileNotFoundError:
                 user_info = {}
-                print("Warning: user info file could not be found at '{}/user.yaml' or at '{}/user_private.yaml'."/format("share","share"))
+                print("Warning: user info file could not be found at 'user.yaml' or at 'user_private.yaml'.")
         data = get_data(template_type)
         if data:
             run_output(target,template_type,data,user_info,user_macros)
