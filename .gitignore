@@ -1,7 +1,8 @@
 *
 # Main files
-!texnew/**
+!/texnew/**
 !Makefile
+!.gitignore
 
 # Info
 !LICENSE
