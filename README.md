@@ -1,7 +1,7 @@
 # texnew
 
 ## Using this program.
-In order to run this, you need some version of python (it definitely works in 3.5, and probably earlier), as well as the `pyyaml`, `argparse` packages. The easiest way to call this at any time is to add something like `alias texnew="python /path/to/texnew/texnew.py"` to your bashrc (or equivalent) and you can call the program globally. Use `texnew -h` for basic usage info.
+You can install this package (along with the script) with `pip install texnew`. If you call the command line version, `texnew` looks for template information at `~/.texnew/` under a specific folder structure. You should also install the included templates there, which you can find at [texnew-templates](https://github.com/alexrutar/texnew-templates). Run `texnew -h` for basic information about the script.
 
 ### Updating your templates
 If you've created a template using this program (after March 20, 2019), you can automatically update the template using `texnew -u <file.tex> <template>`. This saves file macros you've defined (under `file-specific macros`), as well as the main contents of your document (after `document start`), and places them in a newly generated template, generated from the updated macro files. Your old file is saved in the same directory.

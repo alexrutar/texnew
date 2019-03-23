@@ -1,6 +1,13 @@
-.DS_Store
-src/user_private.yaml
-**/*.swp
-test/*
-texnew/__pycache__
-log/*
+*
+# Main files
+!texnew/**
+!Makefile
+
+# Info
+!LICENSE
+!README.md
+
+
+# setup
+!MANIFEST.in
+!setup.py
