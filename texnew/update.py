@@ -1,12 +1,16 @@
 import os
+import re
 
-from .file_mgr import copy_file, get_name, get_div, sep_block
+from .file_mgr import copy_file, get_name, get_div, get_version, sep_block
 from .core import run
+
 
 # main update function
 def update(filename, template_type):
     if not os.path.exists(filename):
         print("Error: The file \"{}\" does not exist. Please choose another filename.".format(filename))
+    elif get_version(filename).startswith("0."):
+        print("Error: File too outdated! Must be generated with version at least 1.0.")
     else:
         # copy the file to a new location
         name = get_name(filename,"_old")

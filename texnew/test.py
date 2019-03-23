@@ -35,11 +35,12 @@ def is_empty(dct):
 
 # run the test
 def test():
-    # clean log directory
+    # clean log/test directory
     clean_dir("log")
+    clean_dir("test")
 
     # iterate over possible template names
-    for tm in truncated_files("templates"):
+    for tm in truncated_files("share","templates"):
         # build the template in "test"
         run(rpath("test","test.tex"), tm)
 

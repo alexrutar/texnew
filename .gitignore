@@ -5,7 +5,6 @@
 !/texnew/
 !Makefile
 !.gitignore
-texnew/__pycache__
 
 # Info
 !LICENSE
@@ -15,3 +14,8 @@ texnew/__pycache__
 # setup
 !MANIFEST.in
 !setup.py
+
+# and ignore more things
+texnew/__pycache__
+.DS_Store
+*.swp

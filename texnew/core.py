@@ -2,6 +2,7 @@ import yaml
 import os
 import re
 
+from . import __version__
 from .file_mgr import filestring, truncated_files, rpath, get_div
 
 # print a divider to the specified output
@@ -17,15 +18,16 @@ def repl_match(name):
 
 # the main file-building function
 def run_output(target,template_type,data,user_info,user_macros):
-    tex_doctype = re.sub(repl_match("doctype"), data['doctype'], filestring("defaults","doctype.tex"))
-    tex_packages = filestring("defaults","packages.tex")
-    tex_macros = filestring("defaults","macros.tex")
-    tex_formatting = filestring("formatting",data['formatting'] + '.tex')
+    tex_doctype = re.sub(repl_match("doctype"), data['doctype'], filestring("share","defaults","doctype.tex"))
+    tex_packages = filestring("share","defaults","packages.tex")
+    tex_macros = filestring("share","defaults","macros.tex")
+    tex_formatting = filestring("share","formatting",data['formatting'] + '.tex')
     for k in user_info.keys():
         tex_formatting = re.sub(repl_match(k), str(user_info[k]), tex_formatting)
 
     with open(target,"a+") as output:
-        output.write("% Template created by texnew (author: Alex Rutar); info can be found at 'https://github.com/alexrutar/texnew'.")
+        output.write("% Template created by texnew (author: Alex Rutar); info can be found at 'https://github.com/alexrutar/texnew'.\n")
+        output.write("% version ({})\n".format(__version__))
 
         # create doctype
         write_div(output, "doctype")
@@ -40,7 +42,7 @@ def run_output(target,template_type,data,user_info,user_macros):
         output.write(tex_macros)
         for name in data['macros']:
             write_div(output, name+" macros")
-            output.write(filestring("macros",name + ".tex"))
+            output.write(filestring("share","macros",name + ".tex"))
 
 
         # add space for user macros
@@ -73,9 +75,9 @@ def load_yaml(*rel_path):
 def get_data(template_type):
     data = []
     try:
-        data = load_yaml("templates",template_type + ".yaml")
+        data = load_yaml("share","templates",template_type + ".yaml")
     except FileNotFoundError:
-        print("The template \"{}\" does not exist! The possible template names are:\n".format(template_type)+ "\t".join(truncated_files("templates")))
+        print("The template \"{}\" does not exist! The possible template names are:\n".format(template_type)+ "\t".join(truncated_files("share","templates")))
     return data
 
 # essentially a wrapper for run_output
@@ -90,7 +92,7 @@ def run(target, template_type, user_macros={}):
                 user_info = load_yaml("user.yaml")
             except FileNotFoundError:
                 user_info = {}
-                print("Warning: user info file could not be found at 'user.yaml' or at 'user_private.yaml'. Run 'texnew -i' for more info.")
+                print("Warning: user info file could not be found at '{}/user.yaml' or at '{}/user_private.yaml'."/format("share","share"))
         data = get_data(template_type)
         if data:
             run_output(target,template_type,data,user_info,user_macros)

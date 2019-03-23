@@ -1,7 +1,19 @@
 import os
+import re
 from os.path import expanduser
 
 from . import __path__
+
+# check for file version
+def get_version(filename):
+    with open(filename,'r') as f:
+        st = f.read()
+    pat = re.compile(r"% version \((.*)\)")
+    res = pat.search(st)
+    if res:
+        return res.group(1)
+    else:
+        return "0.1"
 
 # create a new block divider
 def get_div(name):
@@ -18,7 +30,8 @@ def truncated_files(*rel_path):
 # clean the directory at a relative path
 def clean_dir(*rel_path):
     for fl in os.listdir(rpath(*rel_path)):
-        os.remove(rpath(*rel_path,fl))
+        if not fl.startswith("."):
+            os.remove(rpath(*rel_path,fl))
 
 # read file at a relative path
 def filestring(*rel_path):

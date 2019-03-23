@@ -1,14 +1,41 @@
+"""
+Entry point for the texnew script installed along with this package.
+
+
+
+    texnew [-uv] target template
+
+    banditvis [-cl]
+    banditvis -h | --help
+    banditvis -V | --version
+
+Positional:
+  target                The name of the file to action.
+  template              The name of the template to use.
+
+Optional:
+  -u                    Update the target template with the given file.
+  -v                    Run verbose.
+
+Other:
+  -c                    Check existing templates for errors.
+  -l                    List existing templates.
+
+"""
 import sys
 import argparse
 
+from . import __version__
 from .test import test
 from .core import run
 from .file_mgr import truncated_files
-from .update import update
+from .update import update as texnew_update
 
+def get_usage():
+    return '\n\n\n'.join(__doc__.split('\n\n\n')[1:])
 # main argument parser, after pre-checking info
 def parse():
-    parser = argparse.ArgumentParser(prog="texnew",description='An automatic LaTeX template creator.')
+    parser = argparse.ArgumentParser(prog="texnew",description='An automatic LaTeX template creator.',usage=get_usage())
     parser.add_argument('target', metavar='output', type=str, nargs=1,
                                 help='the name of the file you want to create')
     parser.add_argument('template_type', metavar='template', type=str, nargs=1,
@@ -22,15 +49,20 @@ def parse():
     return (args.target[0], args.template_type[0], args.update)
 
 def main():
-    if "-l" in sys.argv:
+    # special use cases:
+    if ("-h"  in sys.argv[1:]) or ("--help" in sys.argv[1:]) or (len(sys.argv) == 1):
+        print(get_usage())
+    elif "-V" in sys.argv[1:] or "--version" in sys.argv[1:]:
+        print("texnew ({})".format(__version__))
+    elif "-l" in sys.argv[1:]:
         print("\nRoot Folder: {}/".format(rpath()))
-        print("Existing templates:\n"+ "\t".join(truncated_files("templates")))
-    elif "-c" in sys.argv:
+        print("Existing templates:\n"+ "\t".join(truncated_files("share","templates")))
+    elif "-c" in sys.argv[1:]:
         test()
     else:
         target, template_type, update = parse()
         if update:
-            update(target, template_type)
+            texnew_update(target, template_type)
         else:
             if not target.endswith(".tex"):
                 target = target + ".tex"
