@@ -20,15 +20,14 @@ Optional:
 Other:
   -c                    Check existing templates for errors.
   -l                    List existing templates.
-
 """
 import sys
 import argparse
 
 from . import __version__
 from .test import test
-from .core import run
-from .file_mgr import truncated_files
+from .scripts import run
+from .file_mgr import truncated_files, rpath
 from .update import update as texnew_update
 
 def get_usage():
@@ -56,7 +55,7 @@ def main():
         print("texnew ({})".format(__version__))
     elif "-l" in sys.argv[1:]:
         print("\nRoot Folder: {}/".format(rpath()))
-        print("Existing templates:\n"+ "\t".join(truncated_files("share","templates")))
+        print("Existing templates:\n"+ "\t".join(truncated_files("templates")))
     elif "-c" in sys.argv[1:]:
         test()
     else:

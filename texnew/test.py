@@ -1,7 +1,7 @@
 import subprocess
 import os
 
-from .core import run
+from .scripts import run
 from .file_mgr import truncated_files, rpath, clean_dir, copy_file
 
 # parse the file for errors
@@ -40,7 +40,7 @@ def test():
     clean_dir("test")
 
     # iterate over possible template names
-    for tm in truncated_files("share","templates"):
+    for tm in truncated_files("templates"):
         # build the template in "test"
         run(rpath("test","test.tex"), tm)
 

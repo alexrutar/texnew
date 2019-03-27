@@ -3,7 +3,8 @@ import os
 import re
 
 from . import __version__
-from .file_mgr import filestring, truncated_files, rpath, get_div
+from .file_mgr import rpath, get_div, read_file
+from .error import TexnewInputError, TexnewFileError
 
 # print a divider to the specified output
 def write_div(out, name):
@@ -16,17 +17,40 @@ def repl_match(name):
     else:
         return r"<\+" + str(name) + r"\+>"
 
+# load template information
+def load_template(template_type):
+    try:
+        return read_file("templates",template_type,method="yaml")
+    except TexnewFileError as e:
+        e.context = "template"
+        e.context_info['type'] = template_type
+        raise e
+
+# load user information
+def load_user(info_name = "default"):
+    try:
+        return read_file("user",info_name,method="yaml")
+    except TexnewFileError as e:
+        e.context = "user"
+        e.context_info['name'] = info_name
+        raise e
+
+# somehow remove template generation? is it worth it
 # the main file-building function
-def run_output(target,template_type,data,user_info,user_macros):
-    tex_doctype = re.sub(repl_match("doctype"), data['doctype'], filestring("share","defaults","doctype.tex"))
-    tex_packages = filestring("share","defaults","packages.tex")
-    tex_macros = filestring("share","defaults","macros.tex")
-    tex_formatting = filestring("share","formatting",data['formatting'] + '.tex')
+# data = load_template(template_type)
+# user_info = load_user(aname)
+# merge error types
+def run(target,data,user_info,user_macros={}):
+    tex_doctype = re.sub(repl_match("doctype"), data['doctype'], read_file("share","defaults","doctype.tex",method="str"))
+    tex_packages = read_file("share","defaults","packages.tex",method="str")
+    tex_macros = read_file("share","defaults","macros.tex",method="str")
+    tex_formatting = read_file("share","formatting",data['formatting'] + '.tex',method="str")
     
     # substitute user_info
     for k in user_info.keys():
         tex_formatting = re.sub(repl_match(k), str(user_info[k]), tex_formatting)
 
+    # generate output file
     with open(target,"a+") as output:
         output.write("% Template created by texnew (author: Alex Rutar); info can be found at 'https://github.com/alexrutar/texnew'.\n")
         output.write("% version ({})\n".format(__version__))
@@ -44,7 +68,7 @@ def run_output(target,template_type,data,user_info,user_macros):
         output.write(tex_macros)
         for name in data['macros']:
             write_div(output, name+" macros")
-            output.write(filestring("share","macros",name + ".tex"))
+            output.write(read_file("share","macros",name + ".tex",method="str"))
 
         # add space for user macros
         write_div(output, "file-specific macros")
@@ -67,33 +91,3 @@ def run_output(target,template_type,data,user_info,user_macros):
             output.write("\nREPLACE\n")
             output.write("\\end{document}\n")
 
-# return yaml information from a relative path
-def load_yaml(*rel_path):
-    with open(rpath(*rel_path),'r') as source:
-        return yaml.load(source)
-
-# load template information
-def get_data(template_type):
-    data = []
-    try:
-        data = load_yaml("share","templates",template_type + ".yaml")
-    except FileNotFoundError:
-        print("The template \"{}\" does not exist! The possible template names are:\n".format(template_type)+ "\t".join(truncated_files("share","templates")))
-    return data
-
-# essentially a wrapper for run_output
-def run(target, template_type, user_macros={}):
-    if os.path.exists(target):
-        print("Error: The file \"{}\" already exists. Please choose another filename.".format(target))
-    else:
-        try:
-            user_info = load_yaml("user_private.yaml")
-        except FileNotFoundError:
-            try:
-                user_info = load_yaml("user.yaml")
-            except FileNotFoundError:
-                user_info = {}
-                print("Warning: user info file could not be found at 'user.yaml' or at 'user_private.yaml'.")
-        data = get_data(template_type)
-        if data:
-            run_output(target,template_type,data,user_info,user_macros)
