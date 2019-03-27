@@ -7,7 +7,7 @@ Automatic LaTeX template management.
 :license: MIT, see LICENSE for more details.
 """
 
-__version__ = "1.1"
+__version__ = "1.2"
 
 from texnew.test import parse_errors
 from texnew.update import update
