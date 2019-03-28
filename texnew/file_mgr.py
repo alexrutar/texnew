@@ -4,14 +4,14 @@ import re
 from os.path import expanduser
 
 from . import __path__
-from .error import TexnewFileError
+from .error import TexnewFileError, TexnewInputError
 
 # get the relative path, from this script
 def rpath(*rel_path):
     return os.path.join(expanduser("~"),".texnew",*rel_path)
 
 # methods to open files with special error handling
-def read_file(*rel_path, method = "lst", src = "texnew"):
+def read_file(*rel_path, method = "str", src = "texnew"):
     if src == "texnew":
         path = rpath(*rel_path)
     elif src == "user" and len(rel_path) == 1:
@@ -21,12 +21,12 @@ def read_file(*rel_path, method = "lst", src = "texnew"):
         path += ".yaml"
     try:
         with open(path,'r') as f:
-            if method == "lst":
-                return lst(f)
-            elif method == "str":
+            if method == "str":
                 return f.read()
             elif method == "yaml":
                 return yaml.load(f)
+            elif method == "lst":
+                return list(f)
     except FileNotFoundError:
         if src == "texnew":
             raise TexnewFileError(path)

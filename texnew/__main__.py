@@ -3,7 +3,7 @@ Entry point for the texnew script installed along with this package.
 
 
 
-    texnew [-uv] target template
+    texnew [-uv] [--user=USER] target template
 
     banditvis [-cl]
     banditvis -h | --help
@@ -12,6 +12,9 @@ Entry point for the texnew script installed along with this package.
 Positional:
   target                The name of the file to action.
   template              The name of the template to use.
+
+Named:
+  --user                Specify the user file to use.
 
 Optional:
   -u                    Update the target template with the given file.
@@ -43,9 +46,10 @@ def parse():
     parser.add_argument('-l', "--list", action="store_true", default=False, dest="lst",help="list existing templates and root folder")
     parser.add_argument('-c', "--check", action="store_true", default=False, dest="lst",help="check for errors in existing templates")
     parser.add_argument('-u', "--update", action="store_true", default=False, dest="update",help="update the specified file with the desired template")
+    parser.add_argument("--user", dest="user", default="",help="specify the user file",nargs=1)
 
     args = parser.parse_args()
-    return (args.target[0], args.template_type[0], args.update)
+    return (args.target[0], args.template_type[0], args.update, args.user)
 
 def main():
     # special use cases:
@@ -59,7 +63,7 @@ def main():
     elif "-c" in sys.argv[1:]:
         test()
     else:
-        target, template_type, update = parse()
+        target, template_type, update, user= parse()
         if update:
             texnew_update(target, template_type)
         else:

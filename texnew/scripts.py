@@ -14,6 +14,7 @@ from .error import TexnewFileError, TexnewInputError
 
 # have defaults file in .texnew/defaults
 def run(target, template_type, user_macros={}):
+    # load and catch basic errors with template choice
     if os.path.exists(target):
         print("Error: The file \"{}\" already exists. Please choose another filename.".format(target))
         sys.exit(1)
@@ -28,7 +29,7 @@ def run(target, template_type, user_macros={}):
             user_info = {}
 
     try:
-        data = load_template(template_type)
+        template_data = load_template(template_type)
     except TexnewFileError as e:
         if e.context == "template":
             print("The template \"{}\" does not exist! The possible template names are:\n".format(e.context_info['type'])+ "\t".join(truncated_files("templates")))
@@ -37,18 +38,13 @@ def run(target, template_type, user_macros={}):
         sys.exit(1)
 
     try:
-        run_texnew(target, data, user_info, user_macros)
-        # instead of writing to output, create a file object or string and write afterwards, checking target
+        test = run_texnew(template_data, user_info, user_macros)
+        with open(target, "a+") as f:
+            f.write(test.gen_file())
+
     except TexnewFileError as e:
         print(e)
         sys.exit(1)
     except TexnewInputError as e:
         print(e)
         sys.exit(1)
-
-
-    # look for user file
-    # catch template error and make error message nice
-    # catch source error
-    # catch input error (if necessary, think about it)
-
