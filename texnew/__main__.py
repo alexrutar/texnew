@@ -29,9 +29,9 @@ import argparse
 
 from . import __version__
 from .test import test
-from .scripts import run
-from .file_mgr import truncated_files, rpath
-from .update import update as texnew_update
+from .scripts import run, run_update
+from .template import available_templates
+from .file import rpath
 
 def get_usage():
     return '\n\n\n'.join(__doc__.split('\n\n\n')[1:])
@@ -45,11 +45,11 @@ def parse():
 
     parser.add_argument('-l', "--list", action="store_true", default=False, dest="lst",help="list existing templates and root folder")
     parser.add_argument('-c', "--check", action="store_true", default=False, dest="lst",help="check for errors in existing templates")
-    parser.add_argument('-u', "--update", action="store_true", default=False, dest="update",help="update the specified file with the desired template")
+    parser.add_argument('-u', "--update_file", action="store_true", default=False, dest="update_file",help="update_file the specified file with the desired template")
     parser.add_argument("--user", dest="user", default="",help="specify the user file",nargs=1)
 
     args = parser.parse_args()
-    return (args.target[0], args.template_type[0], args.update, args.user)
+    return (args.target[0], args.template_type[0], args.update_file, args.user)
 
 def main():
     # special use cases:
@@ -59,13 +59,14 @@ def main():
         print("texnew ({})".format(__version__))
     elif "-l" in sys.argv[1:]:
         print("\nRoot Folder: {}/".format(rpath()))
-        print("Existing templates:\n"+ "\t".join(truncated_files("templates")))
+        print("Existing templates:\n"+ "\t".join(available_templates()))
     elif "-c" in sys.argv[1:]:
         test()
     else:
-        target, template_type, update, user= parse()
-        if update:
-            texnew_update(target, template_type)
+        # main program branching
+        target, template_type, update_file, user= parse()
+        if update_file:
+            run_update(target, template_type)
         else:
             if not target.endswith(".tex"):
                 target = target + ".tex"

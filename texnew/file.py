@@ -11,7 +11,7 @@ def rpath(*rel_path):
     return os.path.join(expanduser("~"),".texnew",*rel_path)
 
 # methods to open files with special error handling
-def read_file(*rel_path, method = "str", src = "texnew"):
+def read_file(*rel_path, method = "lst", src = "texnew"):
     if src == "texnew":
         path = rpath(*rel_path)
     elif src == "user" and len(rel_path) == 1:
@@ -85,27 +85,3 @@ def get_name(name,ad):
         attempt = base + ad + t + "." + ftype
         if not os.path.exists(attempt):
             return attempt
-
-# check if a string is a divider (with any name)
-def is_div(st):
-    dv = get_div("")
-    return len(st) == len(dv) and st.startswith(dv[:2]) and st.endswith(dv[-3:])
-
-# separate a block named div_name
-def sep_block(lst, div_name):
-    start = get_div(div_name)
-    read = False
-    id1 = None
-    id2 = None
-    for e,l in enumerate(lst):
-        if read and is_div(l):
-            id2 = e
-            break
-        if l == start:
-            id1 = e+1
-            read = True
-    if id1 is None:
-        return []
-    if id2 is None:
-        return lst[id1:]
-    return lst[id1:id2]

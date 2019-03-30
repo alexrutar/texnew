@@ -7,9 +7,9 @@ Automatic LaTeX template management.
 :license: MIT, see LICENSE for more details.
 """
 
-__version__ = "1.3"
+__version__ = "1.4"
 
-from texnew.test import parse_errors
-from texnew.update import update
-from texnew.core import run
-from texnew.test import test
+from texnew.test import parse_errors, test
+from texnew.template import build, update
+from texnew.document import Document, Divider, TexnewDocument
+import texnew.scripts
