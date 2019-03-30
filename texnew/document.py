@@ -1,8 +1,13 @@
 import re
 import itertools
+import subprocess
 
-from .file import read_file
+# TODO: clean .workspace instead of clean_dir
+from .file import read_file, clean_workspace
 from . import __version__
+
+# TODO: avoid these imports
+from .file import rpath
 
 def _pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
@@ -115,7 +120,7 @@ class Document:
         # add _blocks, blocks; overwrites
         self._blocks[bname] = content_list
         if bname not in self._order:
-            self._order += [bname]
+            self._order.append(bname)
     
     # returns empty block if not contained
     def __missing__(self,bname):
@@ -125,6 +130,32 @@ class Document:
     def __delitem__(self, bname):
         del self._blocks[bname]
         self._order.remove(bname)
+
+# parse the file for errors
+# TODO: this is garbage, fix it (that's probably a lot of work unfortunately)
+# TODO: does not catch warnings
+def parse_errors(*rel_path):
+    dct = {'errors':[],'warnings':[],'fatal':[]}
+    fl = read_file(*rel_path)
+
+    append = False
+    temp = ""
+    for l in fl:
+        if l.startswith("! "):
+            dct['fatal'] += [l]
+        if l.startswith("./.workspace/test.tex:"):
+            temp = l
+            append = True
+        if append:
+            temp += l
+        if l.startswith("l."):
+            temp += l
+            append = False
+            dct['errors'] += [temp]
+    for key in ['errors','warnings','fatal']:
+        if dct[key]:
+            return dct
+    return {}
 
 class TexnewDocument(Document):
     """A special class of type Document with custom loading and checking types, along with a LaTeX style block delimiter"""
@@ -149,5 +180,24 @@ class TexnewDocument(Document):
         for f,g in _pairwise(divs):
             self[f[1]] =  fl[f[0]+1:g[0]-1]
         self[divs[-1][1]] = fl[divs[-1][0]+1:]
-    # TODO: will eventually create an error verification script which consumes a LaTeXDocumet to check that it is an (error-free) LaTeX document
-    # TODO: write comparison methods ?
+
+    def verify(self):
+        """Compile and parse log file for errors."""
+        self.write(rpath(".workspace","test.tex"))
+
+        # compile the template
+        lmk_args = [
+                'latexmk',
+                '-pdf',
+                '-interaction=nonstopmode',
+                '-outdir={}'.format(rpath(".workspace")),
+                rpath(".workspace","test.tex")]
+        try:
+            subprocess.check_output(lmk_args, stderr=subprocess.STDOUT)
+
+            self.logfile = read_file(".workspace","test.log")
+            self.errors = parse_errors(".workspace","test.log") # TODO: should return empty dict if there are no errors
+        except subprocess.CalledProcessError as e:
+            self.errors = {'latexmk': e.output.decode()}
+        clean_workspace()
+        return self.errors

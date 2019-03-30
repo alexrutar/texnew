@@ -53,25 +53,11 @@ def get_version(filename):
     else:
         return "0.1"
 
-# create a new block divider
-def get_div(name):
-    return ("% " + name + " ").ljust(80, "-") + "\n"
-
-# remove the file endings at rel_path
-def truncated_files(*rel_path):
-    return ["".join(s.split(".")[:-1]) for s in get_flist(*rel_path)]
-
-# clean the directory at a relative path
-def clean_dir(*rel_path):
-    for fl in get_flist(*rel_path):
+# clean the workspace
+def clean_workspace():
+    for fl in get_flist(".workspace"):
         if not fl.startswith("."):
-            os.remove(rpath(*rel_path,fl))
-
-# copy a file to the target; only appends, does not overwrite
-def copy_file(src,trg):
-    with open(src,'r') as f, open(trg,'a+') as output:
-        for l in f:
-            output.write(l)
+            os.remove(rpath(".workspace",fl))
 
 # get an available name, inserting 'ad' if necessary
 def get_name(name,ad):

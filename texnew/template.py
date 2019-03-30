@@ -1,6 +1,6 @@
 import re
 
-from .file import read_file, truncated_files
+from .file import read_file, get_flist
 from .error import TexnewFileError
 from .document import TexnewDocument
 
@@ -13,9 +13,9 @@ def load_template(template_type):
         e.context_info['type'] = template_type
         raise e
 
-# TODO: write this function
+# TODO: use PATH, replace get_flist
 def available_templates():
-    return truncated_files("templates")
+    return ["".join(s.split(".")[:-1]) for s in get_flist("templates")]
 
 def load_user(info_name = "default"):
     """Load user information for sub_list"""
@@ -65,5 +65,4 @@ def update(tdoc, template_type, transfer=['file-specific preamble', 'document st
     # write information to new document
     for bname in transfer:
         new_tdoc[bname] = tdoc[bname]
-
     return new_tdoc

@@ -5,9 +5,9 @@ Entry point for the texnew script installed along with this package.
 
     texnew [-uv] [--user=USER] target template
 
-    banditvis [-cl]
-    banditvis -h | --help
-    banditvis -V | --version
+    texnew [-cl]
+    texnew -h | --help
+    texnew -V | --version
 
 Positional:
   target                The name of the file to action.
@@ -28,13 +28,13 @@ import sys
 import argparse
 
 from . import __version__
-from .test import test
-from .scripts import run, run_update
+from .scripts import run, run_update, run_test
 from .template import available_templates
 from .file import rpath
 
 def get_usage():
     return '\n\n\n'.join(__doc__.split('\n\n\n')[1:])
+
 # main argument parser, after pre-checking info
 def parse():
     parser = argparse.ArgumentParser(prog="texnew",description='An automatic LaTeX template creator and manager.',usage=get_usage())
@@ -61,7 +61,7 @@ def main():
         print("\nRoot Folder: {}/".format(rpath()))
         print("Existing templates:\n"+ "\t".join(available_templates()))
     elif "-c" in sys.argv[1:]:
-        test()
+        run_test()
     else:
         # main program branching
         target, template_type, update_file, user= parse()

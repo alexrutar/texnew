@@ -72,3 +72,14 @@ def run_update(fname, template_type):
     os.rename(fname,name)
 
     new_tdoc.write(fname)
+
+# run the test
+def run_test():
+    for tm in available_templates():
+        tdoc = build(load_template(tm))
+        errors = tdoc.verify()
+        if not errors:
+            print("No errors in template '{}'".format(tm))
+        else:
+            print("Errors in template '{}'.".format(tm))
+

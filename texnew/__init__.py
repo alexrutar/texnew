@@ -9,6 +9,5 @@ Automatic LaTeX template management.
 
 __version__ = "1.4"
 
-from texnew.test import parse_errors, test
-from texnew.template import build, update
-from texnew.document import Document, Divider, TexnewDocument
+from .template import build, update
+from .document import Document, Divider, TexnewDocument
