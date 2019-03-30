@@ -12,4 +12,3 @@ __version__ = "1.4"
 from texnew.test import parse_errors, test
 from texnew.template import build, update
 from texnew.document import Document, Divider, TexnewDocument
-import texnew.scripts
