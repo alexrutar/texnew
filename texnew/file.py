@@ -24,7 +24,7 @@ def read_file(*rel_path, method = "lst", src = "texnew"):
             if method == "str":
                 return f.read()
             elif method == "yaml":
-                return yaml.load(f)
+                return yaml.safe_load(f)
             elif method == "lst":
                 return list(f)
     except FileNotFoundError:

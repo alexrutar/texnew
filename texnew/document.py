@@ -64,7 +64,7 @@ class Document:
     def __init__(self, sub_list={}, defaults={}, div_func=None,buf=0):
         self.div = div_func
         self.subs = sub_list
-        self._blocks = {}
+        self._blocks = {} # every entry is now a string
         self._order = [] # order matters here!
         self.buf=buf
         self.defaults = defaults
@@ -171,6 +171,8 @@ class TexnewDocument(Document):
         super().__init__(sub_list, div_func=Divider("%","-"), defaults={**new_defs,**defaults}, buf=2)
 
     # loads a file and appends blocks to current block list
+    # TODO: Path, keep this as list, implement read_file with string from path object;
+    # just wrap the string object with splitting to get a list, and a yaml read to get a yaml
     def load(self,target):
         fl = read_file(target,src="user")
         # read the dividers
