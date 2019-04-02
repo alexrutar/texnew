@@ -13,7 +13,7 @@ setup(
     author='Alex Rutar',
     author_email='arutar@uwaterloo.ca',
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 4 - Beta',
         'Programming Language :: Python :: 3.7',
         'License :: OSI Approved :: MIT License'
         ],

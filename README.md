@@ -1,32 +1,56 @@
-# Basic Usage
-## Using this program.
-You can install this command line tool - as well as the module - with `pip install texnew`.
-Make sure your `pip` version is for Python 3 (it may be installed under `pip3`).
-If you call the command line version, `texnew` looks for template information at `~/.texnew/`.
-You should also install the included templates there, which you can find at [texnew-templates](https://github.com/alexrutar/texnew-templates); installation instructions are on that page.
-Run `texnew -h` for basic information about the script.
+# Introduction
+## Installation
+On MacOS or Linux (I haven't figured it out on Windows yet), install with
+```
+pip install texnew
+cd ~
+git clone https://github.com/alexrutar/texnew-templates .texnew
+```
+Template-specific information can be found at [texnew-templates](https://github.com/alexrutar/texnew-templates).
+Make sure your pip version is at least (python 3.7) with `pip --version`; You might need to use `pip3` instead.
 
-### Update an existing file.
-If you've created a template using this program with `texnew` version at least 1.0, you can automatically update the template using `texnew -u <file.tex> <template>`.
-This saves file macros you've defined (under `file-specific macros`), as well as the main contents of your document (after `document start`), and places them in a newly generated template, generated from the updated macro files.
-Your old file is saved in the same directory with `_old` appended to the name.
+## Basic Usage
+List existing templates with
+```
+texnew -l
+```
+Build a LaTeX file from a template:
+```
+texnew example.tex notes
+```
+Note that the `.tex` is optional - running `texnew example notes` is equivalent.
+Get more syntax help with
+```
+texnew -h
+```
 
-### Checking your templates
-If you made changes to macro files, you can run `texnew -c` to automatically compile your templates and check for LaTeX errors (any error that shows up in your log file).
-Note that the checker works by making a system call to `latexmk`, so it may not work on your system.
-It also might not work on Windows no matter what.
-I'm not sure.
-
-### Including user info
-User info files can be found at `user.yaml`, `user_private.yaml`.
-
-You can input custom information here to be automatically added to templates whenever you generate them; see Formatting below for more detail.
-You can also use `user_private.yaml`, the program will prioritize (if it exists).
+## Other Capabilities
+You can save user info in `.texnew/user/default.yaml` or `.texnew/user/private.yaml`; `private.yaml` is prioritized, if it exists.
+The data saved in these files is automatically substituted into templates - see [Designing Templates](#Designing-Templates).
 If neither user file exists, you will get a warning but the program will still generate a template (without substitutions).
 
-# Roll your own templates
-Templates are organized into template sets.
-If you want to make your own template set, it's recommended to copy the structure in `base`.
+You can change the template type of existing templates:
+```
+texnew example.tex asgn
+cat "new content" >> example.tex
+texnew -u example.tex notes
+```
+Updating preserves the content in the `file-specific preamble` and in `main document`.
+Note that the comment dividers `% div_name ----...` should not be replicated or edited in order for updating to work (or weird things will happen).
+Your old file is saved in the same directory with `_old` appended to the name.
+(Note: this is unstable pre-2.0.)
+
+If you make your own templates or edit macro files, run
+```
+texnew -c
+```
+to automatically compile all templates and check for LaTeX errors.
+Note that the checker works by making a system call to `latexmk`; see the [latexmk documentation](https://mg.readthedocs.io/latexmk.html).
+(This may or may not work on Windows.)
+
+# Designing Templates
+Templates are organized into template sets which can be found in `.texnew/share`.
+If you want to make your own template set, the easiest way is to copy the structure in `base`.
 Template files are placed in the `templates` directory.
 There are three (mandatory) options to be included in the template:
  - `doctype` can be any valid LaTeX document type (e.g. article, book)
