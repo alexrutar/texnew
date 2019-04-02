@@ -2,7 +2,7 @@ import sys
 
 from .template import build, update, load_template, load_user, available_templates
 from .document import TexnewDocument
-from .rpath import get_name, RPath
+from .rpath import safe_rename, RPath
 from pathlib import Path
 
 def run(fname, template_type):
@@ -49,8 +49,7 @@ def run_update(fname, template_type, transfer=['file-specific preamble', 'main d
     new_tdoc = update(tdoc, template_type, transfer)
 
     # copy the existing file to a new location
-    name = get_name(fname,"_old")
-    fpath.rename(name)
+    safe_rename(fpath)
 
     new_tdoc.write(fpath)
 

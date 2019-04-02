@@ -160,7 +160,6 @@ class TexnewDocument(Document):
         # set blocks
         blocks = Divider("%","-").match(fl)
         dct = {blocks[i]:blocks[i+1] for i in range(0,len(blocks),2)}
-        print(dct)
         return cls(dct)
 
     def verify(self):

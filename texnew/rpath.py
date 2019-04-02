@@ -1,9 +1,9 @@
-import os
+import itertools
 import yaml
 from pathlib import Path
 
 # TODO: potentially subclass Path here - however, I've had a hard time doing this, may need to wait for an update
-# would include read_yaml, get_name, and clean_workspace() as custom methods
+# would include read_yaml, get_name, and clean_workspace() as custom methods, change staticmethod to classmethod
 class RPath:
     """Stores the location of core directories"""
     @staticmethod
@@ -18,26 +18,23 @@ class RPath:
     def templates():
         return Path.home() / '.texnew' / 'templates'
 
+
 def read_yaml(path):
     """Read a yaml file pointed to by a path."""
     return yaml.safe_load(path.read_text())
 
-# clean the workspace
+
 def clean_workspace():
+    """Deletes all files in '~/.texnew/.workspace' except .gitignore"""
     for p in RPath.workspace().iterdir():
         if not p.name == ".gitignore":
             p.unlink()
 
 
-# get an available name, inserting 'ad' if necessary
-def get_name(name,ad):
-    if "." in name:
-        base = "".join(name.split(".")[:-1])
-        ftype = name.split(".")[-1]
-    else:
-        base = name
-        ftype = ""
-    for t in [""] + ["_"+str(x) for x in range(1000)]:
-        attempt = base + ad + t + "." + ftype
-        if not os.path.exists(attempt):
-            return attempt
+def safe_rename(path):
+    """Safely rename a file pointed to by path"""
+    for t in itertools.count():
+        new_path = Path(path.parent, "{}_{}".format(path.stem, t) + "".join(path.suffixes))
+        if not new_path.exists():
+            path.rename(new_path)
+            break
