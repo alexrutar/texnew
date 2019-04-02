@@ -178,13 +178,9 @@ class TexnewDocument(Document):
     # just wrap the string object with splitting to get a list, and a yaml read to get a yaml
     def load(self,target):
         fl = read_file(target,src="user")
-        # read the dividers
-        divs = [(i,self.div.name(l)) for i,l in enumerate(fl) if self.div.is_div(l)]
-
-        # break at dividers
-        for f,g in _pairwise(divs):
-            self[f[1]] =  fl[f[0]+1:g[0]-1]
-        self[divs[-1][1]] = fl[divs[-1][0]+1:]
+        blocks = self.div.match(fl)[1:]
+        for i in range(0, len(blocks), 2):
+            self[blocks[i]] = blocks[i+1]
 
     def verify(self):
         """Compile and parse log file for errors."""

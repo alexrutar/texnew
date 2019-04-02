@@ -57,7 +57,7 @@ def build(template_data, sub_list={}):
 
     return tdoc
 
-def update(tdoc, template_type, transfer=['file-specific preamble', 'document start']):
+def update(tdoc, template_type, transfer):
     # generate replacement document
     user_info = load_user()
     template_data = load_template(template_type)

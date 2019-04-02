@@ -50,7 +50,7 @@ def run(fname, template_type):
 
 #  def update(tdoc, template_type, transfer=['file-specific preamble', 'document start']):
 # TODO: add error handling here
-def run_update(fname, template_type):
+def run_update(fname, template_type, transfer=['file-specific preamble', 'document start']):
     # basic checks
     if not os.path.exists(fname):
         print("Error: No file named \"{}\" to update!".format(fname))
@@ -65,7 +65,7 @@ def run_update(fname, template_type):
     tdoc.load(fname)
 
     # generate replacement document
-    new_tdoc = update(tdoc, template_type)
+    new_tdoc = update(tdoc, template_type, transfer)
 
     # copy the existing file to a new location
     name = get_name(fname,"_old")
