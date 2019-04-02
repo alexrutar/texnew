@@ -1,5 +1,3 @@
-# in script: check that target exists
-    # print("Error: The file \"{}\" already exists. Please choose another filename.".format(target))
 # must specify user file
     # print("Warning: user info file could not be found at 'user.yaml' or at 'user_private.yaml'."), and pass false, if they don't exist
     # check for user file first, raise warning if did not fine
