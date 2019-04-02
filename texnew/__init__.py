@@ -11,3 +11,4 @@ __version__ = "1.4"
 
 from .template import build, update
 from .document import Document, Divider, TexnewDocument
+from .file import RPath

@@ -31,7 +31,7 @@ import argparse
 from . import __version__
 from .scripts import run, run_update, run_test
 from .template import available_templates
-from .file import rpath
+from .file import RPath
 
 def get_usage():
     return '\n\n\n'.join(__doc__.split('\n\n\n')[1:])
@@ -60,7 +60,7 @@ def main():
     elif "-V" in sys.argv[1:] or "--version" in sys.argv[1:]:
         print("texnew ({})".format(__version__))
     elif "-l" in sys.argv[1:]:
-        print("\nRoot Folder: {}/".format(rpath()))
+        print("\nRoot Folder: {}/".format(RPath.texnew()))
         print("Existing templates:\n"+ "\t".join(available_templates()))
     elif "-c" in sys.argv[1:]:
         run_test()

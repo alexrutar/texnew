@@ -1,59 +1,45 @@
-import re
-from pathlib import Path
-
-from .file import read_file, get_flist
-from .error import TexnewFileError
+from .file import RPath, read_yaml
 from .document import TexnewDocument
 
 def load_template(template_type):
     """Load template information for template_data"""
-    try:
-        return read_file("templates",template_type,method="yaml")
-    except TexnewFileError as e:
-        e.context = "template"
-        e.context_info['type'] = template_type
-        raise e
+    return read_yaml(RPath.templates() / (template_type + '.yaml'))
 
 # TODO: use PATH, replace get_flist
 def available_templates():
-    return ["".join(s.split(".")[:-1]) for s in get_flist("templates")]
+    return [s.stem for s in RPath.templates().iterdir()]
 
 def load_user(info_name = "default"):
     """Load user information for sub_list"""
-    try:
-        return read_file("user",info_name,method="yaml")
-    except TexnewFileError as e:
-        e.context = "user"
-        e.context_info['name'] = info_name
-        raise e
+    return read_yaml(RPath.texnew() / 'user' / (info_name + '.yaml'))
 
 def build(template_data, sub_list={}):
     """Build a TexnewDocument from existing template_data.
     Note: makes a lot of assumptions about the structure of template_data"""
     sub_list['doctype'] = template_data['doctype']
-    tdoc = TexnewDocument(sub_list)
-    rel = ['share', template_data['template']]
+    tdoc = TexnewDocument(sub_list=sub_list)
+    p = RPath.texnew() / 'share' / template_data['template']
 
     # set default header
     tdoc['header'] = None
 
     # default components
-    tdoc['doctype'] =  read_file(*rel,"defaults","doctype.tex")
-    tdoc['packages'] =  read_file(*rel,"defaults","packages.tex")
-    tdoc['default macros'] =  read_file(*rel,"defaults","macros.tex")
+    tdoc['doctype'] =  (p / "defaults" / "doctype.tex").read_text()
+    tdoc['packages'] =  (p / "defaults" / "packages.tex").read_text()
+    tdoc['default macros'] =  (p / "defaults" / "macros.tex").read_text()
 
     # special macros
     for name in template_data['macros']:
-        tdoc['macros ({})'.format(name)] = read_file(*rel,"macros",name + ".tex")
+        tdoc['macros ({})'.format(name)] = (p / "macros" / (name + ".tex")).read_text()
     
     # (space for) user macros
     tdoc['file-specific preamble'] =  None
 
     # formatting block
-    tdoc['formatting'] = read_file(*rel,"formatting",template_data['formatting']+ ".tex")
+    tdoc['formatting'] = (p / "formatting" / (template_data['formatting']+ ".tex")).read_text()
 
     # user space
-    tdoc['document start'] = read_file(*rel,"contents",template_data['contents']+ ".tex")
+    tdoc['document start'] = (p / "contents" / (template_data['contents']+ ".tex")).read_text()
 
     return tdoc
 

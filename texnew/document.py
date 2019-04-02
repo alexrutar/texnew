@@ -1,33 +1,12 @@
 import re
 import itertools
 import subprocess
+#  import collections
 
 # TODO: clean .workspace instead of clean_dir
-from .file import read_file, clean_workspace
+from .file import clean_workspace, RPath
 from . import __version__
-
-# TODO: avoid these imports
-from .file import rpath
-
-def _pairwise(iterable):
-    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-    a, b = itertools.tee(iterable)
-    next(b, None)
-    return zip(a, b)
-
-def _strip_block(clist):
-    """Removes trailing whitespace from an input list for a block"""
-    end = -1
-    for i,e in reversed(list(enumerate(clist))):
-        if e:
-            end = i
-            break
-    start = 0
-    for i,e in enumerate(clist):
-        if e:
-            start = i
-            break
-    return clist[start:end+1]
+from pathlib import Path
 
 class Divider:
     """Divider class primarily to be used in the document class"""
@@ -65,7 +44,7 @@ class Document:
     div_func: the divider used when printing the Document
     buf: number of newlines to place at end of printing block
     """
-    def __init__(self, sub_list={}, defaults={}, div_func=None,buf=0):
+    def __init__(self, sub_list={}, defaults={}, div_func=None, buf=0):
         self.div = div_func
         self.subs = sub_list
         self._blocks = {} # every entry is now a string
@@ -88,9 +67,8 @@ class Document:
 
     # write to a document
     # TODO: error handling here, perhaps in some more generic write method
-    def write(self,fname):
-        with open(fname,'a+') as f:
-            f.write(str(self))
+    def write(self,path):
+        path.write_text(str(self))
 
     # access document indices as blocks
     def __getitem__(self,bname):
@@ -138,9 +116,9 @@ class Document:
 # parse the file for errors
 # TODO: this is garbage, fix it (that's probably a lot of work unfortunately)
 # TODO: does not catch warnings
-def parse_errors(*rel_path):
+def parse_errors(path):
     dct = {'errors':[],'warnings':[],'fatal':[]}
-    fl = read_file(*rel_path)
+    fl = path.read_text().split("\n")
 
     append = False
     temp = ""
@@ -176,28 +154,30 @@ class TexnewDocument(Document):
     # loads a file and appends blocks to current block list
     # TODO: Path, keep this as list, implement read_file with string from path object;
     # just wrap the string object with splitting to get a list, and a yaml read to get a yaml
-    def load(self,target):
-        fl = read_file(target,src="user")
+    # TODO: check version, use FutureWarning
+    # TODO: @classmethod for load, return an instance, check to always have fpath input
+    def load(self,fpath):
+        fl = fpath.read_text()
         blocks = self.div.match(fl)[1:]
         for i in range(0, len(blocks), 2):
             self[blocks[i]] = blocks[i+1]
 
     def verify(self):
         """Compile and parse log file for errors."""
-        self.write(rpath(".workspace","test.tex"))
+        self.write(RPath.workspace() / 'test.tex')
 
         # compile the template
         lmk_args = [
                 'latexmk',
                 '-pdf',
                 '-interaction=nonstopmode',
-                '-outdir={}'.format(rpath(".workspace")),
-                rpath(".workspace","test.tex")]
+                '-outdir={}'.format(RPath.workspace()),
+                RPath.workspace() / 'test.tex']
         try:
             subprocess.check_output(lmk_args, stderr=subprocess.STDOUT)
 
-            self.logfile = read_file(".workspace","test.log")
-            self.errors = parse_errors(".workspace","test.log") # TODO: should return empty dict if there are no errors
+            self.logfile = RPath.workspace() / 'test.log'
+            self.errors = parse_errors(RPath.workspace() / 'test.log')
         except subprocess.CalledProcessError as e:
             self.errors = {'latexmk': e.output.decode()}
         clean_workspace()

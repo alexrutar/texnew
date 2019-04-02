@@ -1,27 +1,26 @@
-# must specify user file
-    # print("Warning: user info file could not be found at 'user.yaml' or at 'user_private.yaml'."), and pass false, if they don't exist
-    # check for user file first, raise warning if did not fine
-import os
 import sys
 
 from .template import build, update, load_template, load_user, available_templates
 from .document import TexnewDocument
 from .error import TexnewFileError, TexnewInputError
-from .file import get_version, get_name
+from .file import get_version, get_name, RPath
+from pathlib import Path
 
 # TODO: have defaults file in .texnew/defaults
 def run(fname, template_type):
     # load and catch basic errors with template choice
-    if os.path.exists(fname):
+    fpath = Path(fname)
+    if fpath.exists():
         print("Error: The file \"{}\" already exists. Please choose another filename.".format(fname))
         sys.exit(1)
 
+    # TODO something better than this
     try:
         user_info = load_user("private")
-    except TexnewFileError:
+    except FileNotFoundError:
         try:
             user_info = load_user()
-        except TexnewFileError as e:
+        except FileNotFoundError:
             print("Warning: no user file found, no substitutions will be made!")
             user_info = {}
 
@@ -36,7 +35,7 @@ def run(fname, template_type):
 
     try:
         tdoc = build(template_data, user_info)
-        tdoc.write(fname)
+        tdoc.write(fpath)
 
     # TODO: improve error handling
     except TexnewFileError as e:
@@ -50,7 +49,8 @@ def run(fname, template_type):
 # TODO: add error handling here
 def run_update(fname, template_type, transfer=['file-specific preamble', 'document start']):
     # basic checks
-    if not os.path.exists(fname):
+    fpath = Path(fname)
+    if not fpath.exists():
         print("Error: No file named \"{}\" to update!".format(fname))
         sys.exit(1)
     ver = get_version(fname)
@@ -60,16 +60,16 @@ def run_update(fname, template_type, transfer=['file-specific preamble', 'docume
 
     # load the document
     tdoc = TexnewDocument()
-    tdoc.load(fname)
+    tdoc.load(fpath)
 
     # generate replacement document
     new_tdoc = update(tdoc, template_type, transfer)
 
     # copy the existing file to a new location
     name = get_name(fname,"_old")
-    os.rename(fname,name)
+    fpath.rename(name)
 
-    new_tdoc.write(fname)
+    new_tdoc.write(fpath)
 
 # run the test
 def run_test():
