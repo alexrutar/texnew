@@ -48,7 +48,7 @@ def parse():
     parser.add_argument('-c', "--check", action="store_true", default=False, dest="check",help="check for errors in existing templates")
     parser.add_argument('-u', "--update_file", action="store_true", default=False, dest="update_file",help="update_file the specified file with the desired template")
     parser.add_argument("--user", dest="user", default="",help="specify the user file",nargs=1)
-    parser.add_argument("--keep-formatting", dest="transfer", action="store_true", default=False, help="specify the user file",nargs=0)
+    parser.add_argument("--keep-formatting", dest="transfer", action="store_true", default=False, help="specify the user file")
 
     args = parser.parse_args()
     return (args.target[0], args.template_type[0], args.update_file, args.user, args.transfer)

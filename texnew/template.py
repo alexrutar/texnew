@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 
 from .file import read_file, get_flist
 from .error import TexnewFileError
@@ -45,14 +46,14 @@ def build(template_data, sub_list={}):
     for name in template_data['macros']:
         tdoc['macros ({})'.format(name)] = read_file(*rel,"macros",name + ".tex")
     
-    # add existing user macros
+    # (space for) user macros
     tdoc['file-specific preamble'] =  None
 
     # formatting block
     tdoc['formatting'] = read_file(*rel,"formatting",template_data['formatting']+ ".tex")
 
-    # add existing user contents
-    tdoc['document start'] = None
+    # user space
+    tdoc['document start'] = read_file(*rel,"contents",template_data['contents']+ ".tex")
 
     return tdoc
 

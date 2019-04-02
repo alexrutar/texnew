@@ -11,7 +11,7 @@ def rpath(*rel_path):
     return os.path.join(expanduser("~"),".texnew",*rel_path)
 
 # methods to open files with special error handling
-def read_file(*rel_path, method = "lst", src = "texnew"):
+def read_file(*rel_path, method = "str", src = "texnew"):
     if src == "texnew":
         path = rpath(*rel_path)
     elif src == "user" and len(rel_path) == 1:

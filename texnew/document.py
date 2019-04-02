@@ -44,6 +44,10 @@ class Divider:
     def is_div(self, test):
         test = test.rstrip()
         return test.startswith(self.start) and test.endswith(self.fill) and len(test) == self.length
+    def match(self, search_str):
+        """Split an input string on headers, while keeping the header name."""
+        pat = "^{} (.*) {}*$".format(self.start, self.fill)
+        return re.split(pat,search_str,flags=re.M)
     def name(self, div):
         pat = re.compile("{} (.*) {}*".format(self.start, self.fill))
         res = pat.search(div)
@@ -69,7 +73,7 @@ class Document:
         self.buf=buf
         self.defaults = defaults
 
-    # return a representation of this object (_blocks and blocks)
+    # return a representation of this object (blocks and order)
     def __repr__(self):
         return "Blocks:\n"+repr(self._blocks) + "\nOrder:\n" + repr(self._order)
 
@@ -79,7 +83,7 @@ class Document:
         for block in self._order:
             if self.div:
                 output += self.div.gen(block) + "\n"
-            output += "\n".join(self._blocks[block]) + "\n"*(self.buf+1)
+            output += self._blocks[block] + "\n"*(self.buf+1)
         return output 
 
     # write to a document
@@ -93,7 +97,7 @@ class Document:
         return self._blocks[bname]
 
     # emulate python dict.get
-    def get(self, bname, rep=[]):
+    def get(self, bname, rep=""):
         if bname in self._order:
             return self._blocks[bname]
         else:
@@ -104,27 +108,27 @@ class Document:
         return bname in self._blocks
 
     # add _blocks, will replace if it already exists
-    def __setitem__(self, bname, content_list):
-        # can input blank content_list in any 'False' format
-        if not content_list:
-            content_list = self.defaults.get(bname,[])
+    def __setitem__(self, bname, cstr):
+        # can input blank cstr in any 'False' format
+        if not cstr:
+            cstr = self.defaults.get(bname,"")
 
         # remove trailing whitespace, starting and ending blank lines
-        content_list = _strip_block([l.rstrip() for l in content_list])
+        cstr = cstr.strip()
         
-        # substitute matches in content_list with sub_list
+        # substitute matches in cstr with sub_list
         repl_match = lambda x: r"<\+" + str(x) + r"\+>"
         for k in self.subs.keys():
-            content_list = [re.sub(repl_match(k), str(self.subs[k]), l) for l in content_list]
+            cstr = re.sub(repl_match(k), str(self.subs[k]), cstr)
 
         # add _blocks, blocks; overwrites
-        self._blocks[bname] = content_list
+        self._blocks[bname] = cstr
         if bname not in self._order:
             self._order.append(bname)
     
     # returns empty block if not contained
     def __missing__(self,bname):
-        return []
+        return ""
 
     # delete block
     def __delitem__(self, bname):
@@ -162,11 +166,10 @@ class TexnewDocument(Document):
     def __init__(self, sub_list={},defaults={}):
         # create default settings when inputting block (if block is none)
         new_defs = {
-            'header': ["% Template created by texnew (author: Alex Rutar); info can be found at 'https://github.com/alexrutar/texnew'.",
-                    "% version ({})".format(__version__)
-                ],
-            'file-specific preamble': ["% REPLACE"],
-            'document start': ["REPLACE", "\\end{document}"]
+            'header':("% Template created by texnew (author: Alex Rutar); info can be found at 'https://github.com/alexrutar/texnew'.\n"
+                      "% version ({})".format(__version__)),
+            'file-specific preamble': "% REPLACE",
+            'document start': "REPLACE\n\\end{document}"
         }
         super().__init__(sub_list, div_func=Divider("%","-"), defaults={**new_defs,**defaults}, buf=2)
 
