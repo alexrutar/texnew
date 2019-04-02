@@ -3,7 +3,7 @@ import itertools
 import subprocess
 
 # TODO: clean .workspace instead of clean_dir
-from .file import clean_workspace, RPath
+from .rpath import clean_workspace, RPath
 from . import __version__
 from pathlib import Path
 
@@ -11,31 +11,24 @@ class Divider:
     """Divider class primarily to be used in the document class"""
     def __init__(self, start_symb, fill, length=80):
         if len(fill) != 1:
-            raise ValueError("fill must be a string of length 1")
+            raise ValueError("'fill' must be a string of length 1")
         self.fill = fill
         self.start = start_symb
         self.length = length
+
     def gen(self, name):
-        if len(name) >= self.length:
-            raise ValueError("divider name is too long")
+        if len(name) >= self.length-len(self.start)-3:
+            raise ValueError("Divider name is too long")
         return (self.start + " " + name + " ").ljust(self.length, self.fill)
-    def is_div(self, test):
-        test = test.rstrip()
-        return test.startswith(self.start) and test.endswith(self.fill) and len(test) == self.length
+
     def match(self, search_str):
         """Split an input string on headers, while keeping the header name."""
-        pat = "^{} (.*) {}*$".format(self.start, self.fill)
-        return re.split(pat,search_str,flags=re.M)
-    def name(self, div):
-        pat = re.compile("{} (.*) {}*".format(self.start, self.fill))
-        res = pat.search(div)
-        if res:
-            return res.group(1)
-        else:
-            return None
+        pat = "^(?=.{{{:d}}}$){} (.*) {}+$".format(self.length, self.start, self.fill)
+        return re.split(pat,search_str,flags=re.M)[1:]
 
-# TODO: perhaps subclass collections.abe.MutableMapping - however, this may not preserve order
-# TODO: add a 'load' method to load from a file to TexnewDocument, with @classmethod
+
+# TODO: perhaps subclass collections.abc.MutableMapping - however, this may not preserve order
+# TODO: or, keep dict structure but remove the _order - dict has guaranteed order as of python 3.7
 class Document:
     """A custom method that emulates the python 'dict', but with different construction methods and an inherent order in the keys.
     Also has string methods to appear as a proper block-based document
@@ -156,7 +149,7 @@ class TexnewDocument(Document):
     # TODO: Path, keep this as list, implement read_file with string from path object;
     # just wrap the string object with splitting to get a list, and a yaml read to get a yaml
     @classmethod
-    def load2(cls,fpath):
+    def load(cls,fpath):
         fl = fpath.read_text()
 
         # check version
@@ -165,22 +158,10 @@ class TexnewDocument(Document):
             raise FutureWarning("File version is too old!")
 
         # set blocks
-        blocks = Divider("%","-").match(fl)[1:]
+        blocks = Divider("%","-").match(fl)
         dct = {blocks[i]:blocks[i+1] for i in range(0,len(blocks),2)}
+        print(dct)
         return cls(dct)
-
-    def load(self,fpath):
-        fl = fpath.read_text()
-
-        # check version
-        res = re.compile(r"% version \((.*)\)").search(fl)
-        if not res or res.group(1).startswith("0"):
-            raise FutureWarning("File version is too old!")
-
-        # set blocks
-        blocks = self.div.match(fl)[1:]
-        for i in range(0, len(blocks), 2):
-            self[blocks[i]] = blocks[i+1]
 
     def verify(self):
         """Compile and parse log file for errors."""

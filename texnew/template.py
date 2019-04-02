@@ -1,11 +1,10 @@
-from .file import RPath, read_yaml
+from .rpath import RPath, read_yaml
 from .document import TexnewDocument
 
 def load_template(template_type):
     """Load template information for template_data"""
     return read_yaml(RPath.templates() / (template_type + '.yaml'))
 
-# TODO: use PATH, replace get_flist
 def available_templates():
     return [s.stem for s in RPath.templates().iterdir()]
 
@@ -16,7 +15,9 @@ def load_user(order=['private','default']):
             return read_yaml(path)
     raise FileNotFoundError('Could not find user file!')
 
-def build(template_data, sub_list={}):
+
+# TODO: option to load custom defaults list from template
+def build(template_data, sub_list={}, defaults=['doctype','packages','macros']):
     """Build a TexnewDocument from existing template_data.
     Note: makes a lot of assumptions about the structure of template_data"""
     sub_list['doctype'] = template_data['doctype']
@@ -27,24 +28,24 @@ def build(template_data, sub_list={}):
     tdoc['header'] = None
 
     # default components
-    tdoc['doctype'] =  (p / "defaults" / "doctype.tex").read_text()
-    tdoc['packages'] =  (p / "defaults" / "packages.tex").read_text()
-    tdoc['default macros'] =  (p / "defaults" / "macros.tex").read_text()
+    for name in defaults:
+        tdoc[name] = (p / "defaults" / (name + ".tex")).read_text()
 
     # special macros
     for name in template_data['macros']:
         tdoc['macros ({})'.format(name)] = (p / "macros" / (name + ".tex")).read_text()
     
-    # (space for) user macros
+    # (space for) user preamble
     tdoc['file-specific preamble'] =  None
 
     # formatting block
     tdoc['formatting'] = (p / "formatting" / (template_data['formatting']+ ".tex")).read_text()
 
     # user space
-    tdoc['document start'] = (p / "contents" / (template_data['contents']+ ".tex")).read_text()
+    tdoc['main document'] = (p / "contents" / (template_data['contents']+ ".tex")).read_text()
 
     return tdoc
+
 
 def update(tdoc, template_type, transfer):
     # generate replacement document

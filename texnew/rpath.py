@@ -1,10 +1,11 @@
 import os
 import yaml
-import re
 from pathlib import Path
 
+# TODO: potentially subclass Path here - however, I've had a hard time doing this, may need to wait for an update
+# would include read_yaml, get_name, and clean_workspace() as custom methods
 class RPath:
-    """Encode core directories"""
+    """Stores the location of core directories"""
     @staticmethod
     def texnew():
         return Path.home() / '.texnew'
@@ -18,6 +19,7 @@ class RPath:
         return Path.home() / '.texnew' / 'templates'
 
 def read_yaml(path):
+    """Read a yaml file pointed to by a path."""
     return yaml.safe_load(path.read_text())
 
 # clean the workspace

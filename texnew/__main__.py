@@ -31,7 +31,7 @@ import argparse
 from . import __version__
 from .scripts import run, run_update, run_test
 from .template import available_templates
-from .file import RPath
+from .rpath import RPath
 
 def get_usage():
     return '\n\n\n'.join(__doc__.split('\n\n\n')[1:])
@@ -67,7 +67,7 @@ def main():
     else:
         # main program branching
         target, template_type, update_file, user, tr = parse()
-        transfer=['file-specific preamble', 'document start']
+        transfer=['file-specific preamble', 'main document']
         if tr:
             transfer.append('formatting')
         if update_file:
