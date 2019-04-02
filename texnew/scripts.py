@@ -3,7 +3,7 @@ import sys
 from .template import build, update, load_template, load_user, available_templates
 from .document import TexnewDocument
 from .error import TexnewFileError, TexnewInputError
-from .file import get_version, get_name, RPath
+from .file import get_name, RPath
 from pathlib import Path
 
 # TODO: have defaults file in .texnew/defaults
@@ -14,15 +14,11 @@ def run(fname, template_type):
         print("Error: The file \"{}\" already exists. Please choose another filename.".format(fname))
         sys.exit(1)
 
-    # TODO something better than this
     try:
-        user_info = load_user("private")
+        user_info = load_user()
     except FileNotFoundError:
-        try:
-            user_info = load_user()
-        except FileNotFoundError:
-            print("Warning: no user file found, no substitutions will be made!")
-            user_info = {}
+        print("Warning: no user file found, no substitutions will be made!")
+        user_info = {}
 
     try:
         template_data = load_template(template_type)
@@ -53,14 +49,10 @@ def run_update(fname, template_type, transfer=['file-specific preamble', 'docume
     if not fpath.exists():
         print("Error: No file named \"{}\" to update!".format(fname))
         sys.exit(1)
-    ver = get_version(fname)
-    if ver.startswith("0."):
-        print("Error: File too outdated! Must be generated with version at least 1.0; file version is ({})".format(ver))
-        sys.exit(1)
 
     # load the document
-    tdoc = TexnewDocument()
-    tdoc.load(fpath)
+    tdoc = TexnewDocument.load2(fpath)
+    #  tdoc.load(fpath)
 
     # generate replacement document
     new_tdoc = update(tdoc, template_type, transfer)

@@ -9,15 +9,18 @@ def load_template(template_type):
 def available_templates():
     return [s.stem for s in RPath.templates().iterdir()]
 
-def load_user(info_name = "default"):
+def load_user(order=['private','default']):
     """Load user information for sub_list"""
-    return read_yaml(RPath.texnew() / 'user' / (info_name + '.yaml'))
+    for path in [(RPath.texnew() / 'user' / (a+".yaml")) for a in order]:
+        if path.exists():
+            return read_yaml(path)
+    raise FileNotFoundError('Could not find user file!')
 
 def build(template_data, sub_list={}):
     """Build a TexnewDocument from existing template_data.
     Note: makes a lot of assumptions about the structure of template_data"""
     sub_list['doctype'] = template_data['doctype']
-    tdoc = TexnewDocument(sub_list=sub_list)
+    tdoc = TexnewDocument({}, sub_list=sub_list)
     p = RPath.texnew() / 'share' / template_data['template']
 
     # set default header

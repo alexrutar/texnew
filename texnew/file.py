@@ -20,17 +20,6 @@ class RPath:
 def read_yaml(path):
     return yaml.safe_load(path.read_text())
 
-# check for file version
-# TODO: automatically check version when reading file?
-def get_version(filename):
-    st = Path(filename).read_text()
-    pat = re.compile(r"% version \((.*)\)")
-    res = pat.search(st)
-    if res:
-        return res.group(1)
-    else:
-        return "0.1"
-
 # clean the workspace
 def clean_workspace():
     for p in RPath.workspace().iterdir():

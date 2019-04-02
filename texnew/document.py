@@ -1,7 +1,6 @@
 import re
 import itertools
 import subprocess
-#  import collections
 
 # TODO: clean .workspace instead of clean_dir
 from .file import clean_workspace, RPath
@@ -35,6 +34,8 @@ class Divider:
         else:
             return None
 
+# TODO: perhaps subclass collections.abe.MutableMapping - however, this may not preserve order
+# TODO: add a 'load' method to load from a file to TexnewDocument, with @classmethod
 class Document:
     """A custom method that emulates the python 'dict', but with different construction methods and an inherent order in the keys.
     Also has string methods to appear as a proper block-based document
@@ -44,10 +45,10 @@ class Document:
     div_func: the divider used when printing the Document
     buf: number of newlines to place at end of printing block
     """
-    def __init__(self, sub_list={}, defaults={}, div_func=None, buf=0):
+    def __init__(self, contents, sub_list={}, defaults={}, div_func=None, buf=0):
         self.div = div_func
         self.subs = sub_list
-        self._blocks = {} # every entry is now a string
+        self._blocks = contents # every entry is now a string
         self._order = [] # order matters here!
         self.buf=buf
         self.defaults = defaults
@@ -141,7 +142,7 @@ def parse_errors(path):
 
 class TexnewDocument(Document):
     """A special class of type Document with custom loading and checking types, along with a LaTeX style block delimiter"""
-    def __init__(self, sub_list={},defaults={}):
+    def __init__(self, contents, sub_list={},defaults={}):
         # create default settings when inputting block (if block is none)
         new_defs = {
             'header':("% Template created by texnew (author: Alex Rutar); info can be found at 'https://github.com/alexrutar/texnew'.\n"
@@ -149,15 +150,34 @@ class TexnewDocument(Document):
             'file-specific preamble': "% REPLACE",
             'document start': "REPLACE\n\\end{document}"
         }
-        super().__init__(sub_list, div_func=Divider("%","-"), defaults={**new_defs,**defaults}, buf=2)
+        super().__init__(contents, sub_list, div_func=Divider("%","-"), defaults={**new_defs,**defaults}, buf=2)
 
     # loads a file and appends blocks to current block list
     # TODO: Path, keep this as list, implement read_file with string from path object;
     # just wrap the string object with splitting to get a list, and a yaml read to get a yaml
-    # TODO: check version, use FutureWarning
-    # TODO: @classmethod for load, return an instance, check to always have fpath input
+    @classmethod
+    def load2(cls,fpath):
+        fl = fpath.read_text()
+
+        # check version
+        res = re.compile(r"% version \((.*)\)").search(fl)
+        if not res or res.group(1).startswith("0"):
+            raise FutureWarning("File version is too old!")
+
+        # set blocks
+        blocks = Divider("%","-").match(fl)[1:]
+        dct = {blocks[i]:blocks[i+1] for i in range(0,len(blocks),2)}
+        return cls(dct)
+
     def load(self,fpath):
         fl = fpath.read_text()
+
+        # check version
+        res = re.compile(r"% version \((.*)\)").search(fl)
+        if not res or res.group(1).startswith("0"):
+            raise FutureWarning("File version is too old!")
+
+        # set blocks
         blocks = self.div.match(fl)[1:]
         for i in range(0, len(blocks), 2):
             self[blocks[i]] = blocks[i+1]
