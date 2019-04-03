@@ -6,6 +6,7 @@ def load_template(template_type):
     return read_yaml(RPath.templates() / (template_type + '.yaml'))
 
 def available_templates():
+    """Print available templates"""
     return [s.stem for s in RPath.templates().iterdir()]
 
 def load_user(order=['private','default']):
@@ -18,8 +19,7 @@ def load_user(order=['private','default']):
 
 # TODO: option to load custom defaults list from template
 def build(template_data, sub_list={}, defaults=['doctype','packages','macros']):
-    """Build a TexnewDocument from existing template_data.
-    Note: makes a lot of assumptions about the structure of template_data"""
+    """Build a TexnewDocument from existing template_data."""
     sub_list['doctype'] = template_data['doctype']
     tdoc = TexnewDocument({}, sub_list=sub_list)
     p = RPath.texnew() / 'share' / template_data['template']
@@ -47,10 +47,10 @@ def build(template_data, sub_list={}, defaults=['doctype','packages','macros']):
     return tdoc
 
 
-def update(tdoc, template_type, transfer):
+def update(tdoc, template_data, transfer):
+    """Update a template document with a new template type, preserving the blocks specified in the 'transfer' list"""
     # generate replacement document
     user_info = load_user()
-    template_data = load_template(template_type)
     new_tdoc = build(template_data, sub_list=user_info)
 
     # write information to new document

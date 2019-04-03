@@ -6,6 +6,7 @@ from .rpath import safe_rename, RPath
 from pathlib import Path
 
 def run(fname, template_type):
+    """Make a LaTeX file fname from template name template_type"""
     # load and catch basic errors with template choice
     fpath = Path(fname)
     if fpath.exists():
@@ -35,6 +36,7 @@ def run(fname, template_type):
 
 # TODO: add error handling here
 def run_update(fname, template_type, transfer=['file-specific preamble', 'main document']):
+    """Update given fname to new template_type, preserving blocks in transfer"""
     # basic checks
     fpath = Path(fname)
     if not fpath.exists():
@@ -46,7 +48,8 @@ def run_update(fname, template_type, transfer=['file-specific preamble', 'main d
     #  tdoc.load(fpath)
 
     # generate replacement document
-    new_tdoc = update(tdoc, template_type, transfer)
+    template_data = load_template(template_type)
+    new_tdoc = update(tdoc, template_data, transfer)
 
     # copy the existing file to a new location
     safe_rename(fpath)
@@ -55,6 +58,7 @@ def run_update(fname, template_type, transfer=['file-specific preamble', 'main d
 
 # run the test
 def run_test():
+    """Compile and test every template"""
     for tm in available_templates():
         tdoc = build(load_template(tm))
         errors = tdoc.verify()

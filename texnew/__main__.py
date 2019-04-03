@@ -33,11 +33,12 @@ from .scripts import run, run_update, run_test
 from .template import available_templates
 from .rpath import RPath
 
+# TODO: should probably do something else
 def get_usage():
     return '\n\n\n'.join(__doc__.split('\n\n\n')[1:])
 
-# main argument parser, after pre-checking info
 def parse():
+    """Main argument parser"""
     parser = argparse.ArgumentParser(prog="texnew",description='An automatic LaTeX template creator and manager.',usage=get_usage())
     parser.add_argument('target', metavar='output', type=str, nargs=1,
                                 help='the name of the file you want to create')
@@ -54,7 +55,7 @@ def parse():
     return (args.target[0], args.template_type[0], args.update_file, args.user, args.transfer)
 
 def main():
-    # special use cases:
+    """Script entry point"""
     if ("-h"  in sys.argv[1:]) or ("--help" in sys.argv[1:]) or (len(sys.argv) == 1):
         print(get_usage())
     elif "-V" in sys.argv[1:] or "--version" in sys.argv[1:]:

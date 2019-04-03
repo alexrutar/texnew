@@ -41,16 +41,14 @@ class Document:
     def __init__(self, contents, sub_list={}, defaults={}, div_func=None, buf=0):
         self.div = div_func
         self.subs = sub_list
-        self._blocks = contents # every entry is now a string
+        self._blocks = contents
         self._order = [] # order matters here!
         self.buf=buf
         self.defaults = defaults
 
-    # return a representation of this object (blocks and order)
     def __repr__(self):
         return "Blocks:\n"+repr(self._blocks) + "\nOrder:\n" + repr(self._order)
 
-    # return a string of this object (e.g. for printing)
     def __str__(self):
         output = ""
         for block in self._order:
@@ -59,27 +57,22 @@ class Document:
             output += self._blocks[block] + "\n"*(self.buf+1)
         return output 
 
-    # write to a document
-    # TODO: error handling here, perhaps in some more generic write method
     def write(self,path):
+        """Write to a document"""
         path.write_text(str(self))
 
-    # access document indices as blocks
     def __getitem__(self,bname):
         return self._blocks[bname]
 
-    # emulate python dict.get
     def get(self, bname, rep=""):
         if bname in self._order:
             return self._blocks[bname]
         else:
             return rep
 
-    # check has block
     def __contains__(self,bname):
         return bname in self._blocks
 
-    # add _blocks, will replace if it already exists
     def __setitem__(self, bname, cstr):
         # can input blank cstr in any 'False' format
         if not cstr:
@@ -98,11 +91,9 @@ class Document:
         if bname not in self._order:
             self._order.append(bname)
     
-    # returns empty block if not contained
     def __missing__(self,bname):
         return ""
 
-    # delete block
     def __delitem__(self, bname):
         del self._blocks[bname]
         self._order.remove(bname)
@@ -111,6 +102,7 @@ class Document:
 # TODO: this is garbage, fix it (that's probably a lot of work unfortunately)
 # TODO: does not catch warnings
 def parse_errors(path):
+    """Parse the file path for errors."""
     dct = {'errors':[],'warnings':[],'fatal':[]}
     fl = path.read_text().split("\n")
 
@@ -150,6 +142,7 @@ class TexnewDocument(Document):
     # just wrap the string object with splitting to get a list, and a yaml read to get a yaml
     @classmethod
     def load(cls,fpath):
+        """Constructor for TexnewDocument from filepath"""
         fl = fpath.read_text()
 
         # check version

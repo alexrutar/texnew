@@ -34,7 +34,7 @@ def clean_workspace():
 def safe_rename(path):
     """Safely rename a file pointed to by path"""
     for t in itertools.count():
-        new_path = Path(path.parent, "{}_{}".format(path.stem, t) + "".join(path.suffixes))
+        new_path = path.with_name("{}_{}".format(path.stem, t) + "".join(path.suffixes))
         if not new_path.exists():
             path.rename(new_path)
             break

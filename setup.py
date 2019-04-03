@@ -19,6 +19,7 @@ setup(
         ],
     keywords='LaTeX template',
     license='MIT',
+    python_requires='>=3.7',
     packages=find_packages(),
     install_requires=[
         'pyyaml>=3.13'
