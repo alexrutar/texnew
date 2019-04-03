@@ -98,6 +98,7 @@ class Document:
         del self._blocks[bname]
         self._order.remove(bname)
 
+
 # parse the file for errors
 # TODO: this is garbage, fix it (that's probably a lot of work unfortunately)
 # TODO: does not catch warnings
@@ -124,6 +125,7 @@ def parse_errors(path):
         if dct[key]:
             return dct
     return {}
+
 
 class TexnewDocument(Document):
     """A special class of type Document with custom loading and checking types, along with a LaTeX style block delimiter"""

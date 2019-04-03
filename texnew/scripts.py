@@ -5,6 +5,26 @@ from .document import TexnewDocument
 from .rpath import safe_rename, RPath
 from pathlib import Path
 
+def load_info(template_type):
+    """Load template and user information simultaneously, with error handling."""
+    try:
+        data = load_template(template_type)
+        if 'substitutions' not in data.keys():
+            data['substitutions'] = {}
+    except FileNotFoundError:
+        print("Error: The template \"{}\" does not exist. The possible template names are:\n".format(template_type)+ "\t".join(available_templates()))
+        sys.exit(1)
+
+    try:
+        user = load_user()
+    except FileNotFoundError:
+        print("Warning: no user file found.")
+        user_info = {}
+
+    data['substitutions'].update(user)
+    return data
+
+
 def run(fname, template_type):
     """Make a LaTeX file fname from template name template_type"""
     # load and catch basic errors with template choice
@@ -13,20 +33,11 @@ def run(fname, template_type):
         print("Error: The file \"{}\" already exists. Please choose another filename.".format(fname))
         sys.exit(1)
 
-    try:
-        user_info = load_user()
-    except FileNotFoundError:
-        print("Warning: no user file found, no substitutions will be made!")
-        user_info = {}
+    template_data = load_info(template_type)
 
     try:
-        template_data = load_template(template_type)
-    except FileNotFoundError:
-        print("The template \"{}\" does not exist! The possible template names are:\n".format(template_type)+ "\t".join(available_templates()))
-        sys.exit(1)
-
-    try:
-        tdoc = build(template_data, user_info)
+        # update substitutions
+        tdoc = build(template_data)
         tdoc.write(fpath)
 
     # TODO: this is pretty funny
@@ -34,21 +45,21 @@ def run(fname, template_type):
         print(e)
         sys.exit(1)
 
+
 # TODO: add error handling here
 def run_update(fname, template_type, transfer=['file-specific preamble', 'main document']):
     """Update given fname to new template_type, preserving blocks in transfer"""
     # basic checks
     fpath = Path(fname)
     if not fpath.exists():
-        print("Error: No file named \"{}\" to update!".format(fname))
+        print("Error: No file named \"{}\" to update.".format(fname))
         sys.exit(1)
 
     # load the document
     tdoc = TexnewDocument.load(fpath)
-    #  tdoc.load(fpath)
 
     # generate replacement document
-    template_data = load_template(template_type)
+    template_data = load_info(template_type)
     new_tdoc = update(tdoc, template_data, transfer)
 
     # copy the existing file to a new location
@@ -56,15 +67,15 @@ def run_update(fname, template_type, transfer=['file-specific preamble', 'main d
 
     new_tdoc.write(fpath)
 
-# run the test
+
+# TODO: catch if .workspace doesn't exist for some reason?
 def run_test():
     """Compile and test every template"""
     for tm in available_templates():
-        tdoc = build(load_template(tm))
+        tdoc = build(load_info(tm))
         errors = tdoc.verify()
         if not errors:
             print("No errors in template '{}'".format(tm))
         else:
             print("Errors in template '{}'.".format(tm))
             sys.exit(1)
-

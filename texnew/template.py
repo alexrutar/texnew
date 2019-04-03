@@ -1,13 +1,16 @@
 from .rpath import RPath, read_yaml
 from .document import TexnewDocument
 
-def load_template(template_type):
-    """Load template information for template_data"""
-    return read_yaml(RPath.templates() / (template_type + '.yaml'))
 
 def available_templates():
     """Print available templates"""
     return [s.stem for s in RPath.templates().iterdir()]
+
+
+def load_template(template_type):
+    """Load template information for template_data"""
+    return read_yaml(RPath.templates() / (template_type + '.yaml'))
+
 
 def load_user(order=['private','default']):
     """Load user information for sub_list"""
@@ -17,11 +20,10 @@ def load_user(order=['private','default']):
     raise FileNotFoundError('Could not find user file!')
 
 
-# TODO: option to load custom defaults list from template
-def build(template_data, sub_list={}, defaults=['doctype','packages','macros']):
+# TODO: option to load custom defaults list from template (maybe default list should be found in the root of the template set)
+def build(template_data, defaults=['doctype','packages','macros']):
     """Build a TexnewDocument from existing template_data."""
-    sub_list['doctype'] = template_data['doctype']
-    tdoc = TexnewDocument({}, sub_list=sub_list)
+    tdoc = TexnewDocument({}, sub_list=template_data['substitutions'])
     p = RPath.texnew() / 'share' / template_data['template']
 
     # set default header
@@ -49,9 +51,7 @@ def build(template_data, sub_list={}, defaults=['doctype','packages','macros']):
 
 def update(tdoc, template_data, transfer):
     """Update a template document with a new template type, preserving the blocks specified in the 'transfer' list"""
-    # generate replacement document
-    user_info = load_user()
-    new_tdoc = build(template_data, sub_list=user_info)
+    new_tdoc = build(template_data)
 
     # write information to new document
     for bname in transfer:

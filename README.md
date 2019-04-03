@@ -37,7 +37,7 @@ texnew -u example.tex notes
 ```
 Updating preserves the content in the `file-specific preamble` and in `main document`.
 Note that the comment dividers `% div_name ----...` should not be replicated or edited in order for updating to work (or weird things will happen).
-Your old file is saved in the same directory with `_old` appended to the name.
+Your old file is saved in the same directory with `_n` appended to the name, where `n >= 0` is the smallest integer such that the new filename is unique.
 (Note: this is unstable pre-2.0.)
 
 If you make your own templates or edit macro files, run

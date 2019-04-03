@@ -37,6 +37,7 @@ from .rpath import RPath
 def get_usage():
     return '\n\n\n'.join(__doc__.split('\n\n\n')[1:])
 
+
 def parse():
     """Main argument parser"""
     parser = argparse.ArgumentParser(prog="texnew",description='An automatic LaTeX template creator and manager.',usage=get_usage())
@@ -52,7 +53,9 @@ def parse():
     parser.add_argument("--keep-formatting", dest="transfer", action="store_true", default=False, help="specify the user file")
 
     args = parser.parse_args()
+    # TODO: don't pass like this, just pass args, figure out why some need [0]
     return (args.target[0], args.template_type[0], args.update_file, args.user, args.transfer)
+
 
 def main():
     """Script entry point"""
@@ -78,6 +81,6 @@ def main():
                 target = target + ".tex"
             run(target, template_type)
 
-# entry point for script
+
 if __name__ == "__main__":
     main()
