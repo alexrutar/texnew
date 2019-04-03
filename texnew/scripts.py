@@ -78,4 +78,3 @@ def run_test():
             print("No errors in template '{}'".format(tm))
         else:
             print("Errors in template '{}'.".format(tm))
-            sys.exit(1)
