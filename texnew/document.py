@@ -28,7 +28,7 @@ class Divider:
 
 
 # TODO: perhaps subclass collections.abc.MutableMapping - however, this may not preserve order
-# TODO: or, keep dict structure but remove the _order - dict has guaranteed order as of python 3.7
+# TODO: or, keep dict structure but remove the _order - dict has guaranteed order as of python 3.7 (this is probably the best)
 class Document:
     """A custom method that emulates the python 'dict', but with different construction methods and an inherent order in the keys.
     Also has string methods to appear as a proper block-based document

@@ -3,8 +3,7 @@
 On MacOS or Linux (I haven't figured it out on Windows yet), install with
 ```
 pip install texnew
-cd ~
-git clone https://github.com/alexrutar/texnew-templates .texnew
+git clone https://github.com/alexrutar/texnew-templates ~/.texnew
 ```
 Template-specific information can be found at [texnew-templates](https://github.com/alexrutar/texnew-templates).
 Make sure your pip version is at least Python 3.7 (you can do this with `pip --version`); you might need to use `pip3` instead.
