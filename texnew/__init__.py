@@ -7,7 +7,7 @@ Automatic LaTeX template management.
 :license: MIT, see LICENSE for more details.
 """
 
-__version__ = "1.8"
+__version__ = "1.9"
 
 from .template import build, update
 from .document import Document, Divider, TexnewDocument
