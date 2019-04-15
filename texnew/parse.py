@@ -62,7 +62,7 @@ def parse_errors(args):
         if not check:
             print("Error: ", val)
 
-def parse():
+def main():
     """Main argument parser"""
     parser = argparse.ArgumentParser(prog="texnew",description='An automatic LaTeX template creator and manager.')
     parser.add_argument('-v','--verbose',
