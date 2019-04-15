@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
-from texnew import __version__
+from texnew import __version__, __repo__
 def readme():
-    with open('README.rst') as f:
+    with open('README.rst','r') as f:
         return f.read()
 
 setup(
@@ -9,7 +9,7 @@ setup(
     version=__version__,
     description='An automatic LaTeX template creator and manager.',
     long_description=readme(),
-    url='https://github.com/alexrutar/texnew',
+    url=__repo__,
     author='Alex Rutar',
     author_email='arutar@uwaterloo.ca',
     classifiers=[

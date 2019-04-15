@@ -8,6 +8,7 @@ Automatic LaTeX template management.
 """
 
 __version__ = "1.10"
+__repo__ = "https://github.com/alexrutar/texnew"
 
 from .template import build, update
 from .document import Document, Divider, TexnewDocument

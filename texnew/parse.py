@@ -1,61 +1,40 @@
-"""
-Entry point for the texnew script installed along with this package.
-
-
-
-    texnew [-uv] target template
-
-    texnew [-cl]
-    texnew -h | --help
-    texnew -V | --version
-
-Positional:
-  target                The name of the file to action.
-  template              The name of the template to use.
-
-Optional:
-  -u                    Update the target template with the given file.
-  --keep-formatting     When updating, preserve the formatting section in the file.
-  -v                    Run verbose.
-
-Other:
-  -c                    Check existing templates for errors.
-  -l                    List existing templates.
-"""
 import sys
 import argparse
 
 from .scripts import run, run_update, run_check
 from .template import available_templates
 from .rpath import RPath
-from . import __version__
+from . import __version__, __repo__
 
-def tn(args):
+def _tn(args):
+    """Wrapper for scripts.run"""
     if not args.output[0].endswith(".tex"):
         args.output[0] += ".tex"
     run(args.output[0], args.template[0])
 
-def tn_update(args):
+def _tn_update(args):
+    """Wrapper for scripts.run_update"""
     if args.format:
         args.transfer.extend(['formatting','doctype'])
     run_update(args.target[0], args.template[0], transfer=args.transfer)
 
-def tn_check(args):
+def _tn_check(args):
+    """Wrapper for scripts.run_check"""
     run_check(args.names,run_all=args.all)
 
-def tn_info(args):
-    # TODO
-    # point to installation location
-    # have listing option
+def _tn_info(args):
+    """Print basic repository information."""
     msg = {'lst':"Existing templates:\n"+ "\t".join(available_templates()),
             'dir':'Root directory: {}'.format(RPath.texnew())}
     d = vars(args)
+    print("Repository location: {}".format(__repo__))
     for k in msg.keys():
         if d[k]:
             print(msg[k])
 
 
 def parse_errors(args):
+    """Catch basic errors"""
     checklist = {'texnew_exists': (RPath.texnew().exists(), "Missing template information at '{}'".format(RPath.texnew())),
             'texnew_workspace_exists': (RPath.workspace().exists(), "Missing workspace directory at '{}'".format(RPath.workspace()))}
     for k,(check,val) in checklist.items():
