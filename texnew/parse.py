@@ -1,7 +1,7 @@
 import sys
 import argparse
 
-from .scripts import run, run_update, run_check
+from .scripts import run, run_update, run_check, template_str
 from .template import available_templates
 from .rpath import RPath
 from . import __version__, __repo__
@@ -20,20 +20,27 @@ def _tn_update(args):
 
 def _tn_check(args):
     """Wrapper for scripts.run_check"""
-    run_check(*args.names,run_all=args.all)
+    templates = available_templates()
+    if args.all:
+        targets = ["{}-{}".format(pack,tname) for pack, tname_list in templates.items() for tname in tname_list]
+    elif args.package:
+        targets = ["{}-{}".format(pack,tname) for pack in args.names for tname in templates[pack]]
+    else:
+        targets = args.names
+    run_check(*targets)
 
 def _tn_info(args):
     """Print basic repository information."""
-    msg = {'lst':"Existing templates:\n"+ "\t".join(available_templates()),
-            'dir':'Root directory: {}'.format(RPath.texnew())}
+    msg = {'lst':template_str(),
+            'dir':'Root directory: {}'.format(RPath.texnew()),
+            'repo':"Repository location: {}".format(__repo__)}
     d = vars(args)
-    print("Repository location: {}".format(__repo__))
     for k in msg.keys():
         if d[k]:
             print(msg[k])
 
 
-def parse_errors(args):
+def _parse_errors(args):
     """Catch basic errors"""
     checklist = {'texnew_exists': (RPath.texnew().exists(), "Missing template information at '{}'".format(RPath.texnew())),
             'texnew_workspace_exists': (RPath.workspace().exists(), "Missing workspace directory at '{}'".format(RPath.workspace()))}
@@ -54,7 +61,6 @@ def main():
             version='%(prog)s {}'.format(__version__))
     subparsers = parser.add_subparsers(help="test")
 
-    # main arguments
     parser_main = subparsers.add_parser('new', help='create a new template')
     parser_main.set_defaults(func=_tn)
     parser_main.add_argument('output',
@@ -66,7 +72,6 @@ def main():
             nargs=1,
             help='the name of the template to use')
 
-    # update arguments
     parser_update = subparsers.add_parser('update', help='update an existing file')
     parser_update.set_defaults(func=_tn_update)
     parser_update.add_argument('target',
@@ -87,9 +92,13 @@ def main():
             default=['file-specific preamble', 'main document'],
             help="provide a list of blocks to transfer")
 
-    # check arguments
     parser_check = subparsers.add_parser('check', help='check templates for errors')
     parser_check.set_defaults(func=_tn_check)
+    parser_check.add_argument('-p','--package',
+            dest="package",
+            action="store_true",
+            default=False,
+            help="specify a list of packages to update")
     parser_check.add_argument('names',
             nargs="*",
             default=False,
@@ -100,7 +109,6 @@ def main():
             dest="all",
             help="check all existing templates for errors")
 
-    # info arguments
     parser_info = subparsers.add_parser('info', help='print information about the parser')
     parser_info.set_defaults(func=_tn_info)
     parser_info.add_argument('-l', "--list",
@@ -113,8 +121,13 @@ def main():
             default=False,
             dest="dir",
             help="display path to the root folder")
+    parser_info.add_argument('-r', "--repository",
+            action="store_true",
+            default=False,
+            dest="repo",
+            help="display the link to the repository")
 
     args = parser.parse_args()
-    parse_errors(args)
+    _parse_errors(args)
 
     args.func(args)

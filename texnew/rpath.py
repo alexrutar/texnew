@@ -5,6 +5,7 @@ from pathlib import Path, PosixPath as _PosixPath_, WindowsPath  as _WindowsPath
 
 
 class RPath(Path) :
+    """More construction methods and some other utility methods"""
     def __new__(cls, *args, **kvps):
         return super().__new__(WindowsPath if os.name == 'nt' else PosixPath, *args, **kvps)
 

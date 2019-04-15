@@ -17,8 +17,8 @@ Build a LaTeX file from a template:
 ```
 texnew new example.tex notes
 ```
-Note that the `.tex` is optional - running `texnew new example notes` is equivalent.
-Get more syntax help with
+The `.tex` is optional: running texnew new example notes` is equivalent.
+Get more syntax help with `texnew {new,update,check,info} -h`; for example
 ```
 texnew -h
 texnew new -h
@@ -50,6 +50,11 @@ Run
 texnew check template_name_1 template_name_2 ...
 ```
 to test a specific list of templates.
+Run
+```
+texnew check -p package_1 package_2 ...
+```
+to check every template from a given package.
 
 Note that the checker works by making a system call to `latexmk`; see the [latexmk documentation](https://mg.readthedocs.io/latexmk.html).
 You'll have to install this separately to use this functionality.

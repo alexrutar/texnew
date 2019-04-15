@@ -137,9 +137,6 @@ class TexnewDocument(Document):
         }
         super().__init__(contents, sub_list, div_func=Divider("%","-"), defaults={**new_defs,**defaults}, buf=2)
 
-    # loads a file and appends blocks to current block list
-    # TODO: Path, keep this as list, implement read_file with string from path object;
-    # just wrap the string object with splitting to get a list, and a yaml read to get a yaml
     @classmethod
     def load(cls,fpath):
         """Constructor for TexnewDocument from filepath"""
@@ -165,8 +162,6 @@ class TexnewDocument(Document):
     def get_constants(self):
         return self.constants(self['constants'])
 
-    # TODO: implement this, will take time - needs to somehow delete lines which are to be updated with new constants (but not other lines)
-    # maybe use re.sub? and then append the ones that didn't get subbed?
     def set_constants(self, new):
         """Sets the constant string to be a cleaned up version, appending new values if necessary; does not overwrite existing"""
         existing = self['constants']
