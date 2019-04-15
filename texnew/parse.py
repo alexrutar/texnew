@@ -20,7 +20,7 @@ def _tn_update(args):
 
 def _tn_check(args):
     """Wrapper for scripts.run_check"""
-    run_check(args.names,run_all=args.all)
+    run_check(*args.names,run_all=args.all)
 
 def _tn_info(args):
     """Print basic repository information."""
@@ -56,7 +56,7 @@ def main():
 
     # main arguments
     parser_main = subparsers.add_parser('new', help='create a new template')
-    parser_main.set_defaults(func=tn)
+    parser_main.set_defaults(func=_tn)
     parser_main.add_argument('output',
             type=str,
             nargs=1,
@@ -68,7 +68,7 @@ def main():
 
     # update arguments
     parser_update = subparsers.add_parser('update', help='update an existing file')
-    parser_update.set_defaults(func=tn_update)
+    parser_update.set_defaults(func=_tn_update)
     parser_update.add_argument('target',
             type=str,
             nargs=1,
@@ -89,7 +89,7 @@ def main():
 
     # check arguments
     parser_check = subparsers.add_parser('check', help='check templates for errors')
-    parser_check.set_defaults(func=tn_check)
+    parser_check.set_defaults(func=_tn_check)
     parser_check.add_argument('names',
             nargs="*",
             default=False,
@@ -102,7 +102,7 @@ def main():
 
     # info arguments
     parser_info = subparsers.add_parser('info', help='print information about the parser')
-    parser_info.set_defaults(func=tn_info)
+    parser_info.set_defaults(func=_tn_info)
     parser_info.add_argument('-l', "--list",
             action="store_true",
             default=False,
