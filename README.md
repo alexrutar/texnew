@@ -1,6 +1,6 @@
 # Introduction
 ## Installation
-On MacOS or Linux (I haven't figured it out on Windows yet), install with
+On MacOS or Linux (I'm not sure about Windows yet), install with
 ```
 pip install texnew
 git clone https://github.com/alexrutar/texnew-templates ~/.texnew
@@ -11,16 +11,18 @@ Make sure your pip version is at least Python 3.7 (you can do this with `pip --v
 ## Basic Usage
 List existing templates with
 ```
-texnew -l
+texnew info -l
 ```
 Build a LaTeX file from a template:
 ```
-texnew example.tex notes
+texnew new example.tex notes
 ```
-Note that the `.tex` is optional - running `texnew example notes` is equivalent.
+Note that the `.tex` is optional - running `texnew new example notes` is equivalent.
 Get more syntax help with
 ```
 texnew -h
+texnew new -h
+...
 ```
 
 ## Other Capabilities
@@ -30,21 +32,27 @@ If neither user file exists, you will get a warning but the program will still g
 
 You can change the template type of existing files, or update the file to reflect new macros in the template:
 ```
-texnew example.tex asgn
+texnew new example.tex asgn
 cat "new content" >> example.tex
-texnew -u example.tex notes
+texnew update example.tex notes
 ```
 Updating preserves the content in the `file-specific preamble` and in `main document`.
 Note that the comment dividers `% div_name ----...` should not be replicated or edited in order for updating to work (they are used to determine the different components of the file).
 Your old file is saved in the same directory with `_n` appended to the name, where `n >= 0` is the smallest integer such that the new filename is unique.
-(Note: the updating feature is unstable pre-2.0.)
 
 If you make your own templates or edit macro files, run
 ```
-texnew -c
+texnew check --all
 ```
 to automatically compile all templates and check for LaTeX errors.
+Run
+```
+texnew check template_name_1 template_name_2 ...
+```
+to test a specific list of templates.
+
 Note that the checker works by making a system call to `latexmk`; see the [latexmk documentation](https://mg.readthedocs.io/latexmk.html).
+You'll have to install this separately to use this functionality.
 (This may or may not work on Windows.)
 
 # Writing Templates
