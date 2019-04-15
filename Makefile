@@ -12,4 +12,5 @@ upload:
 	-/usr/local/bin/python3 setup.py sdist bdist_wheel
 	-twine upload dist/*
 longtest: test
+	-python3 -m texnew check asgn
 	-python3 -m texnew check --all
