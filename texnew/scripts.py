@@ -68,9 +68,11 @@ def run_update(fname, template_type, transfer=['file-specific preamble', 'main d
 
 
 # TODO: catch if .workspace doesn't exist for some reason?
-def run_test():
+def run_check(*targets, run_all=False):
     """Compile and test every template"""
-    for tm in available_templates():
+    if run_all:
+        targets = available_templates()
+    for tm in targets:
         tdoc = build(load_info(tm))
         errors = tdoc.verify()
         if not errors:
