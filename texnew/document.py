@@ -2,10 +2,8 @@ import re
 import itertools
 import subprocess
 
-# TODO: clean .workspace instead of clean_dir
-from .rpath import clean_workspace, RPath
+from .rpath import RPath
 from . import __version__
-from pathlib import Path
 
 class Divider:
     """Divider class primarily to be used in the document class"""
@@ -17,8 +15,9 @@ class Divider:
         self.length = length
 
     def gen(self, name):
+        """Generate a divider with given name"""
         if len(name) >= self.length-len(self.start)-3:
-            raise ValueError("Divider name is too long")
+            raise ValueError("Divider name is too long.")
         return (self.start + " " + name + " ").ljust(self.length, self.fill)
 
     def match(self, search_str):
@@ -27,8 +26,7 @@ class Divider:
         return re.split(pat,search_str,flags=re.M)[1:]
 
 
-# TODO: perhaps subclass collections.abc.MutableMapping - however, this may not preserve order
-# TODO: or, keep dict structure but remove the _order - dict has guaranteed order as of python 3.7 (this is probably the best)
+# TODO: maybe subclass MutableMapping or dict?
 class Document:
     """A custom method that emulates the python 'dict', but with different construction methods and an inherent order in the keys.
     Also has string methods to appear as a proper block-based document
@@ -41,62 +39,61 @@ class Document:
     def __init__(self, contents, sub_list={}, defaults={}, div_func=None, buf=0):
         self.div = div_func
         self.subs = sub_list
-        self._blocks = contents
-        self._order = [] # order matters here!
+        self.blocks = contents
         self.buf=buf
         self.defaults = defaults
 
     def __repr__(self):
-        return "Blocks:\n"+repr(self._blocks) + "\nOrder:\n" + repr(self._order)
+        return "Blocks:\n"+repr(self.blocks) + "\nOrder:\n" + repr(self.blocks.keys())
 
     def __str__(self):
         output = ""
-        for block in self._order:
+        for block in self.blocks.keys():
             if self.div:
                 output += self.div.gen(block) + "\n"
-            output += self._blocks[block] + "\n"*(self.buf+1)
+            output += self.blocks[block] + "\n"*(self.buf+1)
         return output 
 
     def write(self,path):
         """Write to a document"""
         path.write_text(str(self))
 
-    def __getitem__(self,bname):
-        return self._blocks[bname]
-
-    def get(self, bname, rep=""):
-        if bname in self._order:
-            return self._blocks[bname]
-        else:
-            return rep
-
-    def __contains__(self,bname):
-        return bname in self._blocks
-
-    def __setitem__(self, bname, cstr):
-        # can input blank cstr in any 'False' format
-        if not cstr:
-            cstr = self.defaults.get(bname,"")
-
-        # remove trailing whitespace, starting and ending blank lines
-        cstr = cstr.strip()
-        
+    def _clean(self,cstr):
+        """Internal method to clean up / substitute input"""
         # substitute matches in cstr with sub_list
         repl_match = lambda x: r"<\+" + str(x) + r"\+>"
         for k in self.subs.keys():
             cstr = re.sub(repl_match(k), str(self.subs[k]), cstr)
 
-        # add _blocks, blocks; overwrites
-        self._blocks[bname] = cstr
-        if bname not in self._order:
-            self._order.append(bname)
-    
-    def __missing__(self,bname):
-        return ""
+        # remove trailing whitespace, starting and ending blank lines
+        cstr = cstr.strip()
+        
+        return cstr
+    def append(self,bname,new_cstr):
+        """Add contents to an existing block"""
+        self.blocks[bname] = self.blocks.get(bname,"") + "\n" + self._clean(bname)
+
+    def __getitem__(self,bname):
+        return self.blocks[bname]
+
+    def get(self, bname, rep=""):
+        if bname in self.blocks.keys():
+            return self.blocks[bname]
+        else:
+            return rep
+
+    def __contains__(self,bname):
+        return bname in self.blocks
+
+    def __setitem__(self, bname, cstr):
+        # can input blank cstr in any 'False' format
+        if not cstr:
+            self.blocks[bname] = self.defaults.get(bname,"")
+        else:
+            self.blocks[bname] = self._clean(cstr)
 
     def __delitem__(self, bname):
-        del self._blocks[bname]
-        self._order.remove(bname)
+        del self.blocks[bname]
 
 
 # parse the file for errors
@@ -135,7 +132,8 @@ class TexnewDocument(Document):
             'header':("% Template created by texnew (author: Alex Rutar); info can be found at 'https://github.com/alexrutar/texnew'.\n"
                       "% version ({})".format(__version__)),
             'file-specific preamble': "% REPLACE",
-            'document start': "REPLACE\n\\end{document}"
+            'document start': "REPLACE\n\\end{document}",
+            'constants': ""
         }
         super().__init__(contents, sub_list, div_func=Divider("%","-"), defaults={**new_defs,**defaults}, buf=2)
 
@@ -155,7 +153,30 @@ class TexnewDocument(Document):
         # set blocks
         blocks = Divider("%","-").match(fl)
         dct = {blocks[i]:blocks[i+1] for i in range(0,len(blocks),2)}
+
+        # update constants
         return cls(dct)
+
+    @staticmethod
+    def constants(cstr):
+        pat = r"\\newcommand{\\(.*)}{(.*)}"
+        return {key:val for key,val in re.findall(pat, cstr)}
+
+    def get_constants(self):
+        return self.constants(self['constants'])
+
+    # TODO: implement this, will take time - needs to somehow delete lines which are to be updated with new constants (but not other lines)
+    # maybe use re.sub? and then append the ones that didn't get subbed?
+    def set_constants(self, new):
+        """Sets the constant string to be a cleaned up version, appending new values if necessary; does not overwrite existing"""
+        existing = self['constants']
+        for k in new.keys():
+            repl = "\\\\newcommand{{\\\\{}}}{{{}}}".format(k, new[k])
+            existing, ct = re.subn(r"^\\newcommand{\\" + k + r"}{.*}", repl, existing,flags=re.M)
+            if ct == 0:
+                existing += "\n" +  "\\newcommand{{\\{}}}{{{}}}".format(k, new[k])
+
+        self['constants'] = existing
 
     def verify(self):
         """Compile and parse log file for errors."""
@@ -168,6 +189,7 @@ class TexnewDocument(Document):
                 '-interaction=nonstopmode',
                 '-outdir={}'.format(RPath.workspace()),
                 RPath.workspace() / 'test.tex']
+
         try:
             subprocess.check_output(lmk_args, stderr=subprocess.STDOUT)
 
@@ -175,5 +197,6 @@ class TexnewDocument(Document):
             self.errors = parse_errors(RPath.workspace() / 'test.log')
         except subprocess.CalledProcessError as e:
             self.errors = {'latexmk': e.output.decode()}
-        clean_workspace()
+
+        RPath.clean_workspace()
         return self.errors

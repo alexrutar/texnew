@@ -1,4 +1,4 @@
-from .rpath import RPath, read_yaml
+from .rpath import RPath
 from .document import TexnewDocument
 
 
@@ -9,14 +9,14 @@ def available_templates():
 
 def load_template(template_type):
     """Load template information for template_data"""
-    return read_yaml(RPath.templates() / (template_type + '.yaml'))
+    return (RPath.templates() / (template_type + '.yaml')).read_yaml()
 
 
 def load_user(order=['private','default']):
     """Load user information for sub_list"""
     for path in [(RPath.texnew() / 'user' / (a+".yaml")) for a in order]:
         if path.exists():
-            return read_yaml(path)
+            return path.read_yaml()
     raise FileNotFoundError('Could not find user file!')
 
 
@@ -40,7 +40,14 @@ def build(template_data, defaults=['doctype','packages','macros']):
     # (space for) user preamble
     tdoc['file-specific preamble'] =  None
 
-    # formatting block
+    # file constants
+    constants = (p / "formatting" / (template_data['formatting']+ "_constants.tex"))
+    if constants.exists():
+        tdoc['constants'] = constants.read_text()
+    else:
+        tdoc['constants'] = None
+
+    # formatting
     tdoc['formatting'] = (p / "formatting" / (template_data['formatting']+ ".tex")).read_text()
 
     # user space
@@ -56,4 +63,9 @@ def update(tdoc, template_data, transfer):
     # write information to new document
     for bname in transfer:
         new_tdoc[bname] = tdoc[bname]
+
+    # transfer constants
+    old_constants = tdoc.get_constants()
+    new_tdoc.set_constants(old_constants)
+
     return new_tdoc

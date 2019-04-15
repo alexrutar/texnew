@@ -33,7 +33,7 @@ from .scripts import run, run_update, run_test
 from .template import available_templates
 from .rpath import RPath
 
-# TODO: should probably do something else
+# TODO: should probably do something else (aka fix this)
 def get_usage():
     return '\n\n\n'.join(__doc__.split('\n\n\n')[1:])
 

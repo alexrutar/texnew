@@ -2,8 +2,7 @@ import sys
 
 from .template import build, update, load_template, load_user, available_templates
 from .document import TexnewDocument
-from .rpath import safe_rename, RPath
-from pathlib import Path
+from .rpath import RPath
 
 def load_info(template_type):
     """Load template and user information simultaneously, with error handling."""
@@ -28,7 +27,7 @@ def load_info(template_type):
 def run(fname, template_type):
     """Make a LaTeX file fname from template name template_type"""
     # load and catch basic errors with template choice
-    fpath = Path(fname)
+    fpath = RPath(fname)
     if fpath.exists():
         print("Error: The file \"{}\" already exists. Please choose another filename.".format(fname))
         sys.exit(1)
@@ -50,7 +49,7 @@ def run(fname, template_type):
 def run_update(fname, template_type, transfer=['file-specific preamble', 'main document']):
     """Update given fname to new template_type, preserving blocks in transfer"""
     # basic checks
-    fpath = Path(fname)
+    fpath = RPath(fname)
     if not fpath.exists():
         print("Error: No file named \"{}\" to update.".format(fname))
         sys.exit(1)
@@ -63,7 +62,7 @@ def run_update(fname, template_type, transfer=['file-specific preamble', 'main d
     new_tdoc = update(tdoc, template_data, transfer)
 
     # copy the existing file to a new location
-    safe_rename(fpath)
+    fpath.safe_rename()
 
     new_tdoc.write(fpath)
 
