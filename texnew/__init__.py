@@ -7,7 +7,7 @@ Automatic LaTeX template management.
 :license: MIT, see LICENSE for more details.
 """
 
-__version__ = "1.10"
+__version__ = "1.11"
 __repo__ = "https://github.com/alexrutar/texnew"
 
 from .template import build, update
