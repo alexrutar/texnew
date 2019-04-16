@@ -127,7 +127,6 @@ def parse_errors(path):
 class TexnewDocument(Document):
     """A special class of type Document with custom loading and checking types, along with a LaTeX style block delimiter"""
     def __init__(self, contents, sub_list={},defaults={}):
-        # create default settings when inputting block (if block is none)
         new_defs = {
             'header':("% Template created by texnew (author: Alex Rutar); info can be found at 'https://github.com/alexrutar/texnew'.\n"
                       "% version ({})".format(__version__)),
@@ -139,7 +138,7 @@ class TexnewDocument(Document):
 
     @classmethod
     def load(cls,fpath):
-        """Constructor for TexnewDocument from filepath"""
+        """Constructor for TexnewDocument from an existing document at a specified file path."""
         fl = fpath.read_text()
 
         # check version
@@ -154,6 +153,7 @@ class TexnewDocument(Document):
         # update constants
         return cls(dct)
 
+    # TODO: fix the following three methods for code repetition / unnecessary methods
     @staticmethod
     def constants(cstr):
         pat = r"\\newcommand{\\(.*)}{(.*)}"

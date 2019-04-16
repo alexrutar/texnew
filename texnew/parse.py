@@ -59,9 +59,9 @@ def main():
     parser.add_argument('--version',
             action='version',
             version='%(prog)s {}'.format(__version__))
-    subparsers = parser.add_subparsers(help="test")
+    subparsers = parser.add_subparsers(help="")
 
-    parser_main = subparsers.add_parser('new', help='create a new template')
+    parser_main = subparsers.add_parser('new', help='create a new file')
     parser_main.set_defaults(func=_tn)
     parser_main.add_argument('output',
             type=str,
@@ -109,7 +109,7 @@ def main():
             dest="all",
             help="check all existing templates for errors")
 
-    parser_info = subparsers.add_parser('info', help='print information about the parser')
+    parser_info = subparsers.add_parser('info', help='display information about texnew')
     parser_info.set_defaults(func=_tn_info)
     parser_info.add_argument('-l', "--list",
             action="store_true",
@@ -130,4 +130,10 @@ def main():
     args = parser.parse_args()
     _parse_errors(args)
 
-    args.func(args)
+    try:
+        args.func(args)
+    except AttributeError:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
+
