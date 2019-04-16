@@ -3,13 +3,19 @@ from .document import TexnewDocument
 
 
 def available_templates():
-    """Print available templates"""
+    """
+        **Get Available Templates**
+        Create a dictionary of available templates.
+    The keys in the dictionary are the names of the available packages, and each value is a list of templates which use that package.
+    """
     return {d.name:[s.stem for s in d.iterdir()] for d in RPath.templates().iterdir() if d.is_dir()}
 
 
-def load_template(package,template_name):
-    """Load template information for template_data"""
-    return (RPath.templates() / package / (template_name + '.yaml')).read_yaml()
+def load_template(package, tname):
+    """
+        **Load Template Data**
+    """
+    return (RPath.templates() / package / (tname + '.yaml')).read_yaml()
 
 
 def load_user(order=['private','default']):
@@ -20,43 +26,55 @@ def load_user(order=['private','default']):
     raise FileNotFoundError('Could not find user file!')
 
 
-def build(template_data, defaults=['doctype','packages','macros']):
-    """Build a TexnewDocument from existing template_data."""
-    tdoc = TexnewDocument({}, sub_list=template_data['substitutions'])
+def build(data):
+    """
+        Build a New TexnewDocument.
+
+        Build a TexnewDocument from existing data.
+
+        :return: TexnewDocument object.
+
+        - Example::
+            
+            data = ...
+            build(data)
+
+    """
+    tdoc = TexnewDocument({}, sub_list=data['substitutions'])
 
     # set default header
     tdoc['header'] = None
 
     # default components
-    for name in template_data['info']['defaults']:
-        tdoc[name] = (template_data['root'] / "defaults" / (name + ".tex")).read_text()
+    for name in data['info']['defaults']:
+        tdoc[name] = (data['root'] / "defaults" / (name + ".tex")).read_text()
 
     # special macros
-    for name in template_data['macros']:
-        tdoc['macros ({})'.format(name)] = (template_data['root'] / "macros" / (name + ".tex")).read_text()
+    for name in data['macros']:
+        tdoc['macros ({})'.format(name)] = (data['root'] / "macros" / (name + ".tex")).read_text()
     
     # (space for) user preamble
     tdoc['file-specific preamble'] =  None
 
     # file constants
-    constants = (template_data['root'] / "formatting" / (template_data['formatting']+ "_constants.tex"))
+    constants = (data['root'] / "formatting" / (data['formatting']+ "_constants.tex"))
     if constants.exists():
         tdoc['constants'] = constants.read_text()
     else:
         tdoc['constants'] = None
 
     # formatting
-    tdoc['formatting'] = (template_data['root'] / "formatting" / (template_data['formatting']+ ".tex")).read_text()
+    tdoc['formatting'] = (data['root'] / "formatting" / (data['formatting']+ ".tex")).read_text()
 
     # user space
-    tdoc['main document'] = (template_data['root'] / "contents" / (template_data['contents']+ ".tex")).read_text()
+    tdoc['main document'] = (data['root'] / "contents" / (data['contents']+ ".tex")).read_text()
 
     return tdoc
 
 
-def update(tdoc, template_data, transfer):
+def update(tdoc, data, transfer):
     """Update a template document with a new template type, preserving the blocks specified in the 'transfer' list"""
-    new_tdoc = build(template_data)
+    new_tdoc = build(data)
 
     # write information to new document
     for bname in transfer:
