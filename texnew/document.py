@@ -153,14 +153,10 @@ class TexnewDocument(Document):
         # update constants
         return cls(dct)
 
-    # TODO: fix the following three methods for code repetition / unnecessary methods
-    @staticmethod
-    def constants(cstr):
-        pat = r"\\newcommand{\\(.*)}{(.*)}"
-        return {key:val for key,val in re.findall(pat, cstr)}
-
+    # TODO: fix the following two methods for code repetition / unnecessary methods
     def get_constants(self):
-        return self.constants(self['constants'])
+        pat = r"\\newcommand{\\(.*)}{(.*)}"
+        return {key:val for key,val in re.findall(pat, self.get('constants'))}
 
     def set_constants(self, new):
         """Sets the constant string to be a cleaned up version, appending new values if necessary; does not overwrite existing"""
