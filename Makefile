@@ -1,4 +1,4 @@
-.PHONY: upload test longtest
+.PHONY: upload test longtest version
 test:
 	-trash test/*
 	-python3 -m texnew new test/test.tex asgn
