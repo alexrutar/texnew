@@ -9,7 +9,7 @@ def available_templates():
     The keys in the dictionary are the names of the available packages, and each value is a list of templates which use that package.
     Ignores files that start with '.'
     """
-    return {d.name:[s.stem for s in d.iterdir() if not s.stem.startswith(".")] for d in RPath.templates().iterdir() if d.is_dir()}
+    return {d.name:[s.stem for s in d.iterdir() if (not s.stem.startswith(".")) and s.suffix == ".yaml"] for d in RPath.templates().iterdir() if d.is_dir()}
 
 
 def load_template(package, tname):

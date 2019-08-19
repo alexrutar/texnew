@@ -12,6 +12,7 @@ def parse_ttype(template_type,default='base'):
     elif len(out) == 2:
         return (out[0], out[1])
     else:
+        # TODO: raise error
         print("Error: Invalid package name '{}': contains too many hyphens".format(template_type))
 
 def template_str():
